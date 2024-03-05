@@ -1,0 +1,14 @@
+edition = "2021"
+
+tab_spaces = 3
+newline_style = "Unix"
+reorder_modules = true
+reorder_imports = true
+
+# Options that are still unstable.
+imports_granularity = "Crate"
+group_imports = "StdExternalCrate"
+comment_width = 100
+wrap_comments = true
+normalize_comments = true
+match_block_trailing_comma = true
