@@ -27,11 +27,7 @@ async fn main() {
       .await
       .expect("tcp: unable to create tcp listener");
 
-   let app = Router::new()
-      .route("/hello", get(hello_world))
-      .route("/test", get(test))
-      .route("/test2", get(test2))
-      .merge(routes::auth_user());
+   let app = Router::new().nest("/api/user", routes::user_routes());
 
    axum::serve(listener, app)
       .await

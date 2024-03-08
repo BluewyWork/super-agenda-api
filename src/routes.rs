@@ -2,11 +2,8 @@ use axum::{routing::post, Router};
 
 use crate::controllers;
 
-pub fn auth_user() -> Router {
+pub fn user_routes() -> Router {
    Router::new()
-      .route("/auth/user/login", post(controllers::user::auth::login))
-      .route(
-         "/auth/user/register",
-         post(controllers::user::auth::register),
-      )
+      .route("/auth/login", post(controllers::user::auth::login))
+      .route("/auth/register", post(controllers::user::auth::register))
 }
