@@ -7,7 +7,7 @@ pub struct LoginPayload {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct RegisterPaylaod {
+pub struct RegisterPayload {
    pub username: String,
    pub email: String,
    pub password: String,

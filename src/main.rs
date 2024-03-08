@@ -14,12 +14,13 @@ mod database;
 mod error;
 mod models;
 mod routes;
+mod schemas;
 
 #[tokio::main]
 async fn main() {
    dotenvy::dotenv().expect("dotenv: unable to access .env file");
 
-   let server_address = std::env::var("SERVER_ADDRESS").unwrap_or("localhost:8001".to_owned());
+   let server_address = std::env::var("SERVER_ADDRESS").unwrap_or("localhost:8001".to_string());
    println!("API => {}", server_address);
 
    let listener = TcpListener::bind(&server_address)
