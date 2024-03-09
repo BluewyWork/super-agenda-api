@@ -51,6 +51,11 @@ pub async fn register(payload: Json<RegisterPayload>) -> Answer {
       )
       .await
    {
+      // Specifically searchs for a duplicate key error
+      // and instead of parsing the error message and extracting
+      // the field which value is being duplicated
+      // we can infer that the culprit is the 'email' field
+      // since it is the only unique key this function handles.
       if let ErrorKind::Write(write_failure) = *err.kind {
          if let WriteFailure::WriteError(write_error) = write_failure {
             if write_error.code == 11000 {
