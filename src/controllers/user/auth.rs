@@ -1,23 +1,74 @@
 use axum::{http::StatusCode, Json};
-use mongodb::error::{ErrorKind, WriteFailure};
+use mongodb::{
+   bson::doc,
+   error::{ErrorKind, WriteFailure},
+};
 
 use crate::{
    database::mongodb_connection,
    models::{
       api::Answer,
-      auth::{LoginPayload, RegisterPayload},
+      payload::{LoginPayload, RegisterPayload},
    },
    schemas,
-   utils::security::hash_password,
+   utils::security::{hash_password, verify_password},
 };
 
 pub async fn login(payload: Json<LoginPayload>) -> Answer {
-   if payload.username != "demo" || payload.password != "demo" {
-      return Answer {
-         json: "Invalid Credentials".into(),
-         status: StatusCode::UNAUTHORIZED,
-         ok: true,
-      };
+   let mongodb = match mongodb_connection().await {
+      Ok(client) => client,
+      Err(_) => {
+         return Answer {
+            json: "Something went wrong.".into(),
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            ok: false,
+         }
+      },
+   };
+
+   let users_collection = mongodb.collection::<schemas::User>("users");
+
+   let user_query = users_collection
+      .find_one(doc! { "email": &payload.email }, None)
+      .await;
+
+   let user = match user_query {
+      Ok(user_wrapped) => match user_wrapped {
+         Some(user) => user,
+         None => {
+            return Answer {
+               json: "Invalid Credentials".into(),
+               status: StatusCode::UNAUTHORIZED,
+               ok: false,
+            }
+         },
+      },
+      Err(_) => {
+         return Answer {
+            json: "Something went wrong...".into(),
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            ok: false,
+         }
+      },
+   };
+
+   match verify_password(payload.password.to_string(), &user.password) {
+      Ok(bool) => {
+         if bool == false {
+            return Answer {
+               json: "Invalid Credentials".into(),
+               status: StatusCode::UNAUTHORIZED,
+               ok: false,
+            };
+         }
+      },
+      Err(_) => {
+         return Answer {
+            json: "Something went wrong...".into(),
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            ok: false,
+         }
+      },
    }
 
    Answer {
