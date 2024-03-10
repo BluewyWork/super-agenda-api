@@ -50,22 +50,20 @@ pub async fn login(payload: Json<LoginPayload>) -> Answer {
       },
    };
 
-   match verify_password(payload.password.to_string(), &user.password) {
-      Ok(false) => {
+   if let Ok(bool) = verify_password(payload.password.to_string(), &user.password) {
+      if !bool {
          return Answer {
             json: "Invalid Credentials".into(),
             status: StatusCode::UNAUTHORIZED,
             ok: false,
          };
-      },
-      Ok(true) => {},
-      Err(_) => {
-         return Answer {
-            json: "Something went wrong...".into(),
-            status: StatusCode::INTERNAL_SERVER_ERROR,
-            ok: false,
-         }
-      },
+      }
+   } else {
+      return Answer {
+         json: "Something went wrong...".into(),
+         status: StatusCode::INTERNAL_SERVER_ERROR,
+         ok: false,
+      };
    }
 
    Answer {
