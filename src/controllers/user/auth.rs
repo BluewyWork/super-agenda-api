@@ -33,15 +33,13 @@ pub async fn login(payload: Json<LoginPayload>) -> Answer {
       .await;
 
    let user = match user_query {
-      Ok(user_wrapped) => match user_wrapped {
-         Some(user) => user,
-         None => {
-            return Answer {
-               json: "Invalid Credentials".into(),
-               status: StatusCode::UNAUTHORIZED,
-               ok: false,
-            }
-         },
+      Ok(Some(user)) => user,
+      Ok(None) => {
+         return Answer {
+            json: "Invalid Credentials".into(),
+            status: StatusCode::UNAUTHORIZED,
+            ok: false,
+         };
       },
       Err(_) => {
          return Answer {
@@ -53,15 +51,14 @@ pub async fn login(payload: Json<LoginPayload>) -> Answer {
    };
 
    match verify_password(payload.password.to_string(), &user.password) {
-      Ok(bool) => {
-         if bool == false {
-            return Answer {
-               json: "Invalid Credentials".into(),
-               status: StatusCode::UNAUTHORIZED,
-               ok: false,
-            };
-         }
+      Ok(false) => {
+         return Answer {
+            json: "Invalid Credentials".into(),
+            status: StatusCode::UNAUTHORIZED,
+            ok: false,
+         };
       },
+      Ok(true) => {},
       Err(_) => {
          return Answer {
             json: "Something went wrong...".into(),
