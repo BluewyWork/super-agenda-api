@@ -13,3 +13,4 @@ serde_json = "1.0.114"
 tokio = { version = "1.36.0", features = ["full"] }
 mongodb = "2.8.1"
 bcrypt = "0.15"
+jsonwebtoken = "9.2"
