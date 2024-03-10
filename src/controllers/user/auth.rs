@@ -8,6 +8,7 @@ use crate::{
       auth::{LoginPayload, RegisterPayload},
    },
    schemas,
+   utils::security::hash_password,
 };
 
 pub async fn login(payload: Json<LoginPayload>) -> Answer {
@@ -40,12 +41,23 @@ pub async fn register(payload: Json<RegisterPayload>) -> Answer {
 
    let users_collection = mongodb.collection::<schemas::User>("users");
 
+   let hashed_password = match hash_password(payload.password.to_string()) {
+      Ok(password) => password,
+      Err(_) => {
+         return Answer {
+            json: "Something went wrong...".into(),
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            ok: false,
+         }
+      },
+   };
+
    if let Err(err) = users_collection
       .insert_one(
          schemas::User {
             username: payload.username.to_string(),
             email: payload.email.to_string(),
-            password: payload.password.to_string(),
+            password: hashed_password,
          },
          None,
       )

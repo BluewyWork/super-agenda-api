@@ -15,6 +15,7 @@ mod error;
 mod models;
 mod routes;
 mod schemas;
+mod utils;
 
 #[tokio::main]
 async fn main() {
@@ -32,43 +33,4 @@ async fn main() {
    axum::serve(listener, app)
       .await
       .expect("axum: something went wrong...");
-}
-
-async fn hello_world() -> impl IntoResponse {
-   Html("Hello World")
-}
-
-async fn test() -> Answer {
-   let json = json!({
-      "test": "this is test content"
-   });
-
-   Answer {
-      json,
-      status: StatusCode::ACCEPTED,
-      ok: true,
-   }
-}
-
-async fn test2() -> Answer {
-   let mongodb = match mongodb_connection().await {
-      Ok(client) => client,
-      Err(_) => {
-         return Answer {
-            json: "".into(),
-            status: StatusCode::INTERNAL_SERVER_ERROR,
-            ok: false,
-         };
-      },
-   };
-
-   if let Ok(collection) = mongodb.list_collection_names(None).await {
-      println!("{:?}", collection);
-   }
-
-   Answer {
-      json: "test".into(),
-      status: StatusCode::ACCEPTED,
-      ok: true,
-   }
 }
