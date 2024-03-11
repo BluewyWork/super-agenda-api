@@ -3,6 +3,7 @@ use mongodb::{
    bson::doc,
    error::{ErrorKind, WriteFailure},
 };
+use serde_json::json;
 
 use crate::{
    database::mongodb_connection,
@@ -11,7 +12,10 @@ use crate::{
       payload::{LoginPayload, RegisterPayload},
    },
    schemas,
-   utils::security::{hash_password, verify_password},
+   utils::{
+      jwt::create_token,
+      security::{hash_password, verify_password},
+   },
 };
 
 pub async fn login(payload: Json<LoginPayload>) -> Answer {
@@ -66,8 +70,19 @@ pub async fn login(payload: Json<LoginPayload>) -> Answer {
       };
    }
 
+   let token = match create_token(user.username, user.email) {
+      Ok(token) => token,
+      Err(_) => {
+         return Answer {
+            json: "Unable to create token...".into(),
+            status: StatusCode::INTERNAL_SERVER_ERROR,
+            ok: false,
+         }
+      },
+   };
+
    Answer {
-      json: "Login Successful".into(),
+      json: json! ({ "token": token }),
       status: StatusCode::OK,
       ok: true,
    }
