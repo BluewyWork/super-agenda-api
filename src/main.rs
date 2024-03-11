@@ -1,17 +1,12 @@
-use axum::{
-   http::StatusCode,
-   response::{Html, IntoResponse},
-   routing::get,
-   Router,
-};
-use database::mongodb_connection;
-use models::api::Answer;
-use serde_json::json;
+use axum::Router;
+
 use tokio::net::TcpListener;
 
+use crate::constants::SERVER_ADDRESS;
+
+mod constants;
 mod controllers;
 mod database;
-mod error;
 mod models;
 mod routes;
 mod schemas;
@@ -19,12 +14,9 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
-   dotenvy::dotenv().expect("dotenv: unable to access .env file");
+   println!("API => {}", SERVER_ADDRESS.to_string());
 
-   let server_address = std::env::var("SERVER_ADDRESS").unwrap_or("localhost:8001".to_string());
-   println!("API => {}", server_address);
-
-   let listener = TcpListener::bind(&server_address)
+   let listener = TcpListener::bind(SERVER_ADDRESS.to_string())
       .await
       .expect("tcp: unable to create tcp listener");
 

@@ -1,19 +1,12 @@
 use mongodb::{options::ClientOptions, Client, Database};
 
-pub async fn mongodb_connection() -> Result<Database, ()> {
-   let env_adress_name = "MONGO_URL";
-   let env_address_value = match std::env::var(env_adress_name) {
-      Ok(env) => env,
-      Err(_) => {
-         println!("env: {} not found", env_adress_name);
-         return Err(());
-      },
-   };
+use crate::constants::{MONGO_DB, MONGO_URL};
 
-   let client_options = match ClientOptions::parse(&env_address_value).await {
+pub async fn mongodb_connection() -> Result<Database, ()> {
+   let client_options = match ClientOptions::parse(MONGO_URL.to_string()).await {
       Ok(opt) => opt,
       Err(_) => {
-         println!("mongodb: unable to parse -> {}", env_address_value);
+         println!("mongodb: unable to parse -> {}", MONGO_URL.to_string());
          return Err(());
       },
    };
@@ -26,15 +19,7 @@ pub async fn mongodb_connection() -> Result<Database, ()> {
       },
    };
 
-   let env_database_name = "MONGO_DB";
-   let env_database_value = match std::env::var(env_database_name) {
-      Ok(env) => env,
-      Err(_) => {
-         println!("env: {} not found", env_database_name);
-         return Err(());
-      },
-   };
-   let db = client.database(&env_database_value);
+   let db = client.database(&MONGO_DB);
 
    Ok(db)
 }
