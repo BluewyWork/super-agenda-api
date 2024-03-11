@@ -14,11 +14,11 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
-   println!("API => {}", SERVER_ADDRESS.to_string());
-
    let listener = TcpListener::bind(SERVER_ADDRESS.to_string())
       .await
       .expect("tcp: unable to create tcp listener");
+
+   println!("API => {}", SERVER_ADDRESS.to_string());
 
    let app = Router::new().nest("/api/user", routes::user_routes());
 
