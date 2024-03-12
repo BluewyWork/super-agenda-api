@@ -20,7 +20,7 @@ pub fn create_token(username: String, email: String) -> Result<String, ()> {
    token
 }
 
-pub fn verify_token(token: &str) -> Result<(), ()> {
+pub fn verify_token(token: String) -> Result<(), ()> {
    let _ = decode::<Claims>(
       &token,
       &DecodingKey::from_secret(JWT_SECRET.as_bytes()),
