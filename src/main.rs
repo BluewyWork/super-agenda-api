@@ -7,6 +7,7 @@ use crate::constants::SERVER_ADDRESS;
 mod constants;
 mod controllers;
 mod database;
+mod middleware;
 mod models;
 mod routes;
 mod schemas;
