@@ -12,37 +12,38 @@ pub async fn guest_middleware(request: Request, next: Next) -> Response {
       Some(token_wrapped) => match token_wrapped.to_str() {
          Ok(token) => token.to_string(),
          Err(_) => {
-            let answer = Answer {
+            return Answer {
                json: "Invalid Token".into(),
                status: StatusCode::UNAUTHORIZED,
                ok: false,
-            };
-
-            return answer.into_response();
+            }
+            .into_response();
          },
       },
       None => {
-         let answer = Answer {
+         return Answer {
             json: "Invalid Token".into(),
             status: StatusCode::UNAUTHORIZED,
             ok: false,
-         };
-
-         return answer.into_response();
+         }
+         .into_response();
       },
    };
 
-   if let Err(_) = verify_token(token) {
-      let answer = Answer {
-         json: "Invalid Token".into(),
-         status: StatusCode::UNAUTHORIZED,
-         ok: false,
-      };
+   let jwt_payload = match verify_token(token) {
+      Ok(token) => token,
+      Err(_) => {
+         return Answer {
+            json: "Invalid Token".into(),
+            status: StatusCode::UNAUTHORIZED,
+            ok: false,
+         }
+         .into_response();
+      },
+   };
 
-      return answer.into_response();
-   }
+   let mut request = request;
+   request.extensions_mut().insert(jwt_payload);
 
-   let response = next.run(request).await;
-
-   response
+   next.run(request).await
 }
