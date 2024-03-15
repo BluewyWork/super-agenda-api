@@ -17,3 +17,4 @@ jsonwebtoken = "9.2"
 dotenvy_macro = "0.15.7"
 lazy_static = "1.4.0"
 tower-http = { version = "0.5.2", features = ["cors"] }
+chrono = "0.4.35"

@@ -259,7 +259,9 @@ checksum = "8eaf5903dcbc0a39312feb77df2ff4c76387d591b9fc7b04a238dcf8bb62639a"
 dependencies = [
  "android-tzdata",
  "iana-time-zone",
+ "js-sys",
  "num-traits",
+ "wasm-bindgen",
  "windows-targets 0.52.3",
 ]
 
@@ -1522,6 +1524,7 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "bcrypt",
+ "chrono",
  "dotenvy",
  "dotenvy_macro",
  "jsonwebtoken",
