@@ -31,7 +31,7 @@ pub async fn guest_middleware(request: Request, next: Next) -> Response {
    };
 
    let jwt_payload = match verify_token(token) {
-      Ok(token) => token,
+      Ok(claims) => claims,
       Err(_) => {
          return Answer {
             json: "Invalid Token".into(),
