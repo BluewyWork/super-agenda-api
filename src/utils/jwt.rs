@@ -1,3 +1,4 @@
+use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
@@ -7,17 +8,37 @@ use crate::constants::JWT_SECRET;
 pub struct Claims {
    username: String,
    email: String,
+   exp: usize,
 }
 
 pub fn create_token(username: String, email: String) -> Result<String, ()> {
-   let token = encode(
-      &Header::default(),
-      &Claims { username, email },
-      &EncodingKey::from_secret(JWT_SECRET.as_bytes()),
-   )
-   .map_err(|_| ());
+   let expiration_time = Utc::now()
+      + match TimeDelta::try_days(30 * 6) {
+         Some(time_delta) => time_delta,
+         None => {
+            println!("api: time unit overflow");
+            return Err(());
+         },
+      };
+   let exp_unix_timestamp = expiration_time.timestamp() as usize;
 
-   token
+   let claims = Claims {
+      username,
+      email,
+      exp: exp_unix_timestamp,
+   };
+
+   match encode(
+      &Header::default(),
+      &claims,
+      &EncodingKey::from_secret(JWT_SECRET.as_bytes()),
+   ) {
+      Ok(token) => Ok(token),
+      Err(err) => {
+         println!("api: unable to create token -> {:?}", err);
+         Err(())
+      },
+   }
 }
 
 pub fn verify_token(token: String) -> Result<Claims, ()> {
@@ -27,6 +48,9 @@ pub fn verify_token(token: String) -> Result<Claims, ()> {
       &Validation::default(),
    ) {
       Ok(token_data) => Ok(token_data.claims),
-      Err(_) => Err(()),
+      Err(err) => {
+         println!("api: unable to verify token -> {:?}", err);
+         Err(())
+      },
    }
 }
