@@ -1,11 +1,12 @@
-use axum::{http::StatusCode, Json};
+use axum::{extract::rejection::JsonRejection, http::StatusCode};
 use mongodb::{
    bson::doc,
    error::{ErrorKind, WriteFailure},
 };
-use serde_json::json;
+use serde_json::{json, Value};
 
 use crate::{
+   custom::extractor::Json,
    database::mongodb_connection,
    models::{
       api::Answer,
@@ -18,7 +19,7 @@ use crate::{
    },
 };
 
-pub async fn login(payload: Json<LoginPayload>) -> Answer {
+pub async fn login(Json(payload): Json<LoginPayload>) -> Answer {
    let mongodb = match mongodb_connection().await {
       Ok(client) => client,
       Err(_) => {
@@ -88,7 +89,7 @@ pub async fn login(payload: Json<LoginPayload>) -> Answer {
    }
 }
 
-pub async fn register(payload: Json<RegisterPayload>) -> Answer {
+pub async fn register(Json(payload): Json<RegisterPayload>) -> Answer {
    let mongodb = match mongodb_connection().await {
       Ok(client) => client,
       Err(_) => {
