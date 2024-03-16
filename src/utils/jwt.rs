@@ -6,9 +6,9 @@ use crate::constants::JWT_SECRET;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Claims {
-   username: String,
-   email: String,
-   exp: usize,
+   pub username: String,
+   pub email: String,
+   pub exp: usize,
 }
 
 pub fn create_token(username: String, email: String) -> Result<String, ()> {
