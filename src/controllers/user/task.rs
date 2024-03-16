@@ -4,8 +4,9 @@ use crate::{models::api::Answer, utils::jwt::Claims};
 
 pub async fn create_task(request: Request) -> Answer {
    let claims = request.extensions().get::<Claims>();
-
    println!("{:?}", claims);
+   let x = claims.unwrap();
+   println!("{:?}", x);
 
    return Answer {
       json: "hahaha".into(),
