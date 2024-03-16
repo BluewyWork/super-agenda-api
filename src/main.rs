@@ -1,5 +1,4 @@
 use axum::Router;
-
 use tokio::net::TcpListener;
 
 use crate::constants::SERVER_ADDRESS;
