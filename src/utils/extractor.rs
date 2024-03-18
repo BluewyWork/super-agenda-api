@@ -1,7 +1,4 @@
-use axum::{
-   extract::rejection::JsonRejection, extract::FromRequest, http::StatusCode,
-   response::IntoResponse,
-};
+use axum::{extract::rejection::JsonRejection, extract::FromRequest, response::IntoResponse};
 use serde::Serialize;
 
 use crate::models::api::Answer;
