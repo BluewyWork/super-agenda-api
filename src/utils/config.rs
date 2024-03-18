@@ -1,4 +1,6 @@
-use dotenvy_macro::dotenv;
+use std::env;
+
+use dotenvy::dotenv;
 use lazy_static::lazy_static;
 
 lazy_static! {
@@ -9,25 +11,25 @@ lazy_static! {
 }
 
 fn get_server_adress() -> String {
-   let server_address = dotenv!("SERVER_ADDRESS");
+   dotenv().ok();
 
-   server_address.to_string()
+   env::var("SERVER_ADDRESS").unwrap()
 }
 
 fn get_mongo_url() -> String {
-   let mongo_url = dotenv!("MONGO_URL");
+   dotenv().ok();
 
-   mongo_url.to_string()
+   env::var("MONGO_URL").unwrap()
 }
 
 fn get_mongo_db() -> String {
-   let mongo_db = dotenv!("MONGO_DB");
+   dotenv().ok();
 
-   mongo_db.to_string()
+   env::var("MONGO_DB").unwrap()
 }
 
 fn get_jwt_secret() -> String {
-   let jwt_secret = dotenv!("JWT_SECRET");
+   dotenv().ok();
 
-   jwt_secret.to_string()
+   env::var("JWT_SECRET").unwrap()
 }
