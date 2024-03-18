@@ -3,7 +3,6 @@ use axum::{
    response::IntoResponse,
 };
 use serde::Serialize;
-use serde_json::{json, Value};
 
 use crate::models::api::Answer;
 
