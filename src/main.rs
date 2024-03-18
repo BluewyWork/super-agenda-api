@@ -1,9 +1,9 @@
 use axum::Router;
 use tokio::net::TcpListener;
 
-use crate::constants::SERVER_ADDRESS;
+use crate::config::SERVER_ADDRESS;
 
-mod constants;
+mod config;
 mod controllers;
 mod database;
 mod middleware;

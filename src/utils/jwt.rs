@@ -2,7 +2,7 @@ use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
-use crate::constants::JWT_SECRET;
+use crate::config::JWT_SECRET;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Claims {
