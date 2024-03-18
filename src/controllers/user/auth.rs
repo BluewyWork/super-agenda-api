@@ -6,13 +6,13 @@ use mongodb::{
 use serde_json::json;
 
 use crate::{
-   custom::extractor::Json,
    database::mongodb_connection,
    models::{
       api::Answer,
       payload::{LoginPayload, RegisterPayload},
    },
    schemas,
+   utils::extractor::Json,
    utils::{
       jwt::create_token,
       security::{hash_password, verify_password},

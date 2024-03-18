@@ -5,7 +5,6 @@ use crate::constants::SERVER_ADDRESS;
 
 mod constants;
 mod controllers;
-mod custom;
 mod database;
 mod middleware;
 mod models;
