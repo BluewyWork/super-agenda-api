@@ -1,6 +1,6 @@
 use mongodb::{options::ClientOptions, Client, Database};
 
-use crate::config::{MONGO_DB, MONGO_URL};
+use crate::utils::config::{MONGO_DB, MONGO_URL};
 
 pub async fn mongodb_connection() -> Result<Database, ()> {
    let client_options = match ClientOptions::parse(MONGO_URL.to_string()).await {

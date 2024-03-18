@@ -9,8 +9,8 @@ use crate::{
    models::{
       api::Answer,
       payload::{LoginPayload, RegisterPayload},
+      schemas,
    },
-   schemas,
    utils::database::mongodb_connection,
    utils::extractor::Json,
    utils::{
