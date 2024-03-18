@@ -1,9 +1,9 @@
-use axum::{extract::rejection::JsonRejection, http::StatusCode};
+use axum::http::StatusCode;
 use mongodb::{
    bson::doc,
    error::{ErrorKind, WriteFailure},
 };
-use serde_json::{json, Value};
+use serde_json::json;
 
 use crate::{
    custom::extractor::Json,
