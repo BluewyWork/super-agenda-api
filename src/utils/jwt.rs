@@ -2,7 +2,7 @@ use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
-use crate::utils::config::JWT_SECRET;
+use crate::utils::{config::JWT_SECRET, log::plog};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Claims {
@@ -16,7 +16,11 @@ pub fn create_token(username: String, email: String) -> Result<String, ()> {
       + match TimeDelta::try_days(30 * 6) {
          Some(time_delta) => time_delta,
          None => {
-            println!("api: time unit overflow");
+            plog(
+               "number size is bigger than supported".to_string(),
+               "jwt".to_string(),
+               true,
+            );
             return Err(());
          },
       };
@@ -35,7 +39,7 @@ pub fn create_token(username: String, email: String) -> Result<String, ()> {
    ) {
       Ok(token) => Ok(token),
       Err(err) => {
-         println!("api: unable to create token -> {:?}", err);
+         plog(format!("{:?}", err.kind()), "jwt".to_string(), true);
          Err(())
       },
    }
@@ -49,7 +53,7 @@ pub fn verify_token(token: String) -> Result<Claims, ()> {
    ) {
       Ok(token_data) => Ok(token_data.claims),
       Err(err) => {
-         println!("api: unable to verify token -> {:?}", err);
+         plog(format!("{:?}", err.kind()), "jwt".to_string(), true);
          Err(())
       },
    }

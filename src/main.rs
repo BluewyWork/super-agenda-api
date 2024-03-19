@@ -1,7 +1,7 @@
 use axum::Router;
 use tokio::net::TcpListener;
 
-use crate::utils::config::SERVER_ADDRESS;
+use crate::utils::{config::SERVER_ADDRESS, log::plog};
 
 mod controllers;
 mod middleware;
@@ -11,15 +11,19 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
-   let listener = TcpListener::bind(SERVER_ADDRESS.to_string())
-      .await
-      .expect("tcp: unable to create tcp listener");
+   let listener = match TcpListener::bind(SERVER_ADDRESS.to_string()).await {
+      Ok(listener) => listener,
+      Err(err) => {
+         plog(format!("{}", err), "main".to_string(), true);
+         return;
+      },
+   };
 
-   println!("API => {}", *SERVER_ADDRESS);
+   println!("Server running on {}", *SERVER_ADDRESS);
 
    let app = Router::new().nest("/api/user", routes::user_routes());
 
-   axum::serve(listener, app)
-      .await
-      .expect("axum: something went wrong...");
+   if let Err(err) = axum::serve(listener, app).await {
+      plog(format!("{}", err), "main".to_string(), true);
+   };
 }
