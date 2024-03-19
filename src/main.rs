@@ -15,7 +15,7 @@ async fn main() {
       .await
       .expect("tcp: unable to create tcp listener");
 
-   println!("API => {}", SERVER_ADDRESS.to_string());
+   println!("API => {}", *SERVER_ADDRESS);
 
    let app = Router::new().nest("/api/user", routes::user_routes());
 
