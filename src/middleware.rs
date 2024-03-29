@@ -4,6 +4,7 @@ use axum::{
    middleware::Next,
    response::{IntoResponse, Response},
 };
+use serde_json::json;
 
 use crate::{models::api::Answer, utils::jwt::verify_token};
 
@@ -13,7 +14,7 @@ pub async fn guest_middleware(request: Request, next: Next) -> Response {
          Ok(token) => token.to_string(),
          Err(_) => {
             return Answer {
-               json: "Invalid Token".into(),
+               data: "Invalid Token".into(),
                status: StatusCode::UNAUTHORIZED,
                ok: false,
             }
@@ -22,7 +23,7 @@ pub async fn guest_middleware(request: Request, next: Next) -> Response {
       },
       None => {
          return Answer {
-            json: "Invalid Token".into(),
+            data: "Invalid Token".into(),
             status: StatusCode::UNAUTHORIZED,
             ok: false,
          }
@@ -34,7 +35,7 @@ pub async fn guest_middleware(request: Request, next: Next) -> Response {
       Ok(claims) => claims,
       Err(_) => {
          return Answer {
-            json: "Invalid Token".into(),
+            data: "Invalid Token".into(),
             status: StatusCode::UNAUTHORIZED,
             ok: false,
          }
@@ -46,4 +47,14 @@ pub async fn guest_middleware(request: Request, next: Next) -> Response {
    request.extensions_mut().insert(jwt_payload);
 
    next.run(request).await
+}
+
+pub async fn response_mapper(response: Response) -> Answer {
+   let ok = response.status() < StatusCode::from_u16(400).unwrap();
+
+   Answer {
+      data: json!({}),
+      status: response.status(),
+      ok: ok,
+   }
 }

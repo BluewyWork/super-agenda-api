@@ -17,7 +17,7 @@ impl<T: Serialize> IntoResponse for Json<T> {
 impl From<JsonRejection> for Answer {
    fn from(rejection: JsonRejection) -> Self {
       Self {
-         json: rejection.body_text().into(),
+         data: rejection.body_text().into(),
          status: rejection.status(),
          ok: false,
       }

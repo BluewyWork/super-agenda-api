@@ -1,4 +1,4 @@
-use axum::Router;
+use axum::{http::StatusCode, routing::get, Router};
 use tokio::net::TcpListener;
 
 use crate::utils::{config::SERVER_ADDRESS, log::plog};
@@ -21,7 +21,10 @@ async fn main() {
 
    println!("Server running on {}", *SERVER_ADDRESS);
 
-   let app = Router::new().nest("/api/user", routes::user_routes());
+   let app = Router::new()
+      .nest("/api/user", routes::user_routes())
+      .route("/hi", get(|| async { return StatusCode::ACCEPTED }))
+      .layer(axum::middleware::map_response(middleware::response_mapper));
 
    if let Err(err) = axum::serve(listener, app).await {
       plog(format!("{}", err), "main".to_string(), true);

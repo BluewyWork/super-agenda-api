@@ -6,18 +6,18 @@ use axum::{
 use serde_json::{json, Value};
 
 pub struct Answer {
-   pub json: Value,
+   pub data: Value,
    pub status: StatusCode,
    pub ok: bool,
 }
 
 impl IntoResponse for Answer {
    fn into_response(self) -> Response {
-      let body = Json(json!({
-         "data": self.json,
+      let json = Json(json!({
+         "data": self.data,
          "ok": self.ok
       }));
 
-      (self.status, body).into_response()
+      (self.status, json).into_response()
    }
 }
