@@ -16,6 +16,6 @@ impl<T: Serialize> IntoResponse for Json<T> {
 
 impl From<JsonRejection> for Answer {
    fn from(rejection: JsonRejection) -> Self {
-      Self::from_status_error(rejection.status(), rejection.body_text().into())
+      Self::from_status_message(rejection.status(), rejection.body_text().into())
    }
 }

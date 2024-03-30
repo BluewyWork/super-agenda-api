@@ -9,7 +9,6 @@ pub struct Answer {
    pub status: StatusCode,
    pub message: String,
    pub data: Value,
-   pub error: String,
 }
 
 #[allow(dead_code)]
@@ -19,7 +18,6 @@ impl Answer {
          status: StatusCode::OK,
          message: String::from(""),
          data: json!({}),
-         error: String::from(""),
       }
    }
 
@@ -28,7 +26,6 @@ impl Answer {
          status,
          message: String::from(""),
          data: json!({}),
-         error: String::from(""),
       }
    }
 
@@ -37,7 +34,6 @@ impl Answer {
          status,
          message,
          data: json!({}),
-         error: String::from(""),
       }
    }
 
@@ -46,16 +42,6 @@ impl Answer {
          status,
          message,
          data,
-         error: String::from(""),
-      }
-   }
-
-   pub fn from_status_error(status: StatusCode, error: String) -> Answer {
-      Answer {
-         status,
-         message: String::from(""),
-         data: json!({}),
-         error,
       }
    }
 }
@@ -68,7 +54,6 @@ impl IntoResponse for Answer {
          "ok": ok,
          "message": self.message,
          "data": self.data,
-         "error": self.error
       }));
 
       (self.status, json).into_response()
