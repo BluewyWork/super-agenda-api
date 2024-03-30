@@ -1,7 +1,7 @@
 use axum::{extract::rejection::JsonRejection, extract::FromRequest, response::IntoResponse};
 use serde::Serialize;
 
-use crate::models::api::Answer;
+use crate::response::Answer;
 
 #[derive(FromRequest)]
 #[from_request(via(axum::Json), rejection(Answer))]
@@ -16,10 +16,6 @@ impl<T: Serialize> IntoResponse for Json<T> {
 
 impl From<JsonRejection> for Answer {
    fn from(rejection: JsonRejection) -> Self {
-      Self {
-         data: rejection.body_text().into(),
-         status: rejection.status(),
-         ok: false,
-      }
+      Self::from_status_error(rejection.status(), rejection.body_text().into())
    }
 }
