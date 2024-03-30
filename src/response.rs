@@ -73,7 +73,7 @@ impl IntoResponse for Success {
          Self::TokenCreated(token) => Answer::from_status_message_data(
             StatusCode::CREATED,
             String::from("LOGIN SUCCESS"),
-            json!(token),
+            json!({ "token": token }),
          )
          .into_response(),
          Self::UserCreated => Answer::from_status(StatusCode::CREATED).into_response(),
