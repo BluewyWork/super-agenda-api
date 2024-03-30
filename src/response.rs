@@ -12,6 +12,7 @@ pub struct Answer {
    pub error: String,
 }
 
+#[allow(dead_code)]
 impl Answer {
    pub fn new() -> Answer {
       Answer {
@@ -24,7 +25,7 @@ impl Answer {
 
    pub fn from_status(status: StatusCode) -> Answer {
       Answer {
-         status: status,
+         status,
          message: String::from(""),
          data: json!({}),
          error: String::from(""),
@@ -33,8 +34,8 @@ impl Answer {
 
    pub fn from_status_message(status: StatusCode, message: String) -> Answer {
       Answer {
-         status: status,
-         message: message,
+         status,
+         message,
          data: json!({}),
          error: String::from(""),
       }
@@ -42,19 +43,19 @@ impl Answer {
 
    pub fn from_status_message_data(status: StatusCode, message: String, data: Value) -> Answer {
       Answer {
-         status: status,
-         message: message,
-         data: data,
+         status,
+         message,
+         data,
          error: String::from(""),
       }
    }
 
    pub fn from_status_error(status: StatusCode, error: String) -> Answer {
       Answer {
-         status: status,
+         status,
          message: String::from(""),
          data: json!({}),
-         error: error,
+         error,
       }
    }
 }
@@ -78,6 +79,7 @@ pub type Result = core::result::Result<Success, Error>;
 
 pub enum Success {
    TokenCreated(String),
+   UserCreated,
 }
 
 impl IntoResponse for Success {
@@ -89,6 +91,7 @@ impl IntoResponse for Success {
             json!(token),
          )
          .into_response(),
+         Self::UserCreated => Answer::from_status(StatusCode::CREATED).into_response(),
       }
    }
 }
@@ -98,6 +101,7 @@ pub enum Error {
    DatabaseConnectionFail,
    PasswordStuff,
    TokenStuff,
+   EmailAlreadyInUse,
 }
 
 impl IntoResponse for Error {
@@ -105,9 +109,7 @@ impl IntoResponse for Error {
       match self {
          Self::LoginFail => Answer::from_status(StatusCode::FORBIDDEN).into_response(),
          // TODO: Improve this type of syntax formatting.
-         Self::DatabaseConnectionFail | Self::PasswordStuff | Self::TokenStuff => {
-            Answer::from_status(StatusCode::INTERNAL_SERVER_ERROR).into_response()
-         },
+         _ => Answer::from_status(StatusCode::INTERNAL_SERVER_ERROR).into_response(),
       }
    }
 }

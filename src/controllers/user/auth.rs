@@ -1,4 +1,3 @@
-use axum::http::StatusCode;
 use mongodb::{
    bson::doc,
    error::{ErrorKind, WriteFailure},
@@ -52,64 +51,49 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
    Ok(response::Success::TokenCreated(token))
 }
 
-// pub async fn register(Json(payload): Json<RegisterPayload>) -> Answer {
-//    let mongodb = match mongodb_connection().await {
-//       Ok(client) => client,
-//       Err(_) => {
-//          return Answer {
-//             data: "Something went wrong.".into(),
-//             status: StatusCode::INTERNAL_SERVER_ERROR,
-//          }
-//       },
-//    };
+pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result {
+   let mongodb = match mongodb_connection().await {
+      Ok(client) => client,
+      Err(_) => {
+         return Err(response::Error::DatabaseConnectionFail);
+      },
+   };
 
-//    let users_collection = mongodb.collection::<schemas::User>("users");
+   let users_collection = mongodb.collection::<schemas::User>("users");
 
-//    let hashed_password = match hash_password(payload.password.to_string()) {
-//       Ok(password) => password,
-//       Err(_) => {
-//          return Answer {
-//             data: "Something went wrong...".into(),
-//             status: StatusCode::INTERNAL_SERVER_ERROR,
-//          }
-//       },
-//    };
+   let hashed_password = match hash_password(payload.password.to_string()) {
+      Ok(password) => password,
+      Err(_) => {
+         return Err(response::Error::PasswordStuff);
+      },
+   };
 
-//    if let Err(err) = users_collection
-//       .insert_one(
-//          schemas::User {
-//             username: payload.username.to_string(),
-//             email: payload.email.to_string(),
-//             password: hashed_password,
-//          },
-//          None,
-//       )
-//       .await
-//    {
-//       // Specifically searchs for a duplicate key error
-//       // and instead of parsing the error message and extracting
-//       // the field which value is being duplicated
-//       // we can infer that the culprit is the 'email' field
-//       // since it is the only unique key this function handles.
-//       if let ErrorKind::Write(write_failure) = *err.kind {
-//          if let WriteFailure::WriteError(write_error) = write_failure {
-//             if write_error.code == 11000 {
-//                return Answer {
-//                   data: "Email already in use.".into(),
-//                   status: StatusCode::CONFLICT,
-//                };
-//             }
-//          }
-//       }
+   if let Err(err) = users_collection
+      .insert_one(
+         schemas::User {
+            username: payload.username.to_string(),
+            email: payload.email.to_string(),
+            password: hashed_password,
+         },
+         None,
+      )
+      .await
+   {
+      // Specifically searchs for a duplicate key error
+      // and instead of parsing the error message and extracting
+      // the field which value is being duplicated
+      // we can infer that the culprit is the 'email' field
+      // since it is the only unique key this function handles.
+      if let ErrorKind::Write(write_failure) = *err.kind {
+         if let WriteFailure::WriteError(write_error) = write_failure {
+            if write_error.code == 11000 {
+               return Err(response::Error::EmailAlreadyInUse);
+            }
+         }
+      }
 
-//       return Answer {
-//          data: "Something went wrong.".into(),
-//          status: StatusCode::INTERNAL_SERVER_ERROR,
-//       };
-//    }
+      return Err(response::Error::DatabaseConnectionFail);
+   }
 
-//    Answer {
-//       data: "User Registered Sucessfully".into(),
-//       status: StatusCode::OK,
-//    }
-// }
+   return Ok(response::Success::UserCreated);
+}
