@@ -95,5 +95,5 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
       return Err(response::Error::DatabaseConnectionFail);
    }
 
-   return Ok(response::Success::UserCreated);
+   Ok(response::Success::UserCreated)
 }
