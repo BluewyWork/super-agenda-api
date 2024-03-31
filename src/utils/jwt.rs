@@ -7,11 +7,10 @@ use crate::utils::{config::JWT_SECRET, log::plog};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Claims {
    pub username: String,
-   pub email: String,
    pub exp: usize,
 }
 
-pub fn create_token(username: String, email: String) -> Result<String, ()> {
+pub fn create_token(username: String) -> Result<String, ()> {
    let expiration_time = Utc::now()
       + match TimeDelta::try_days(30 * 6) {
          Some(time_delta) => time_delta,
@@ -28,7 +27,6 @@ pub fn create_token(username: String, email: String) -> Result<String, ()> {
 
    let claims = Claims {
       username,
-      email,
       exp: exp_unix_timestamp,
    };
 

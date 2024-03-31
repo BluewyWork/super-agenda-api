@@ -9,6 +9,6 @@ pub struct LoginPayload {
 #[derive(Debug, Deserialize)]
 pub struct RegisterPayload {
    pub username: String,
-   pub email: String,
    pub password: String,
+   pub display_name: String,
 }

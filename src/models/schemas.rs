@@ -1,11 +1,40 @@
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
    pub username: String,
-   pub email: String,
    pub password: String,
+   pub email: Option<String>,
+   pub recovery_email: Option<String>,
+   pub phone_number: Option<Phone>,
+   pub display_name: String,
+   pub social_id: String,
+}
+
+impl User {
+   pub fn from_username_password_display_name(
+      username: String,
+      password: String,
+      display_name: String,
+   ) -> User {
+      User {
+         username,
+         password,
+         email: None,
+         recovery_email: None,
+         phone_number: None,
+         display_name,
+         social_id: String::from(Uuid::new_v4()),
+      }
+   }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Phone {
+   pub country_code: u16,
+   pub number: u32,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

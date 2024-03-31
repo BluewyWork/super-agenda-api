@@ -43,7 +43,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
       return Err(response::Error::PasswordStuff);
    }
 
-   let token = match create_token(user.username, user.email) {
+   let token = match create_token(user.username) {
       Ok(token) => token,
       Err(_) => return Err(response::Error::TokenStuff),
    };
@@ -70,11 +70,11 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
 
    if let Err(err) = users_collection
       .insert_one(
-         schemas::User {
-            username: payload.username.to_string(),
-            email: payload.email.to_string(),
-            password: hashed_password,
-         },
+         schemas::User::from_username_password_display_name(
+            payload.username,
+            hashed_password,
+            payload.display_name,
+         ),
          None,
       )
       .await
