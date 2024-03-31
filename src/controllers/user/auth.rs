@@ -26,7 +26,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
    let users_collection = mongodb.collection::<schemas::User>("users");
 
    let user_query = users_collection
-      .find_one(doc! { "email": &payload.email }, None)
+      .find_one(doc! { "username": &payload.username }, None)
       .await;
 
    let user = match user_query {
