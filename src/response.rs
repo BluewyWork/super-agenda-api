@@ -93,7 +93,6 @@ impl IntoResponse for Error {
    fn into_response(self) -> Response {
       match self {
          Self::LoginFail => Answer::from_status(StatusCode::FORBIDDEN).into_response(),
-         // TODO: Improve this type of syntax formatting.
          _ => Answer::from_status(StatusCode::INTERNAL_SERVER_ERROR).into_response(),
       }
    }
