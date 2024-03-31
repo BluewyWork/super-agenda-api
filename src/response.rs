@@ -76,7 +76,10 @@ impl IntoResponse for Success {
             json!({ "token": token }),
          )
          .into_response(),
-         Self::UserCreated => Answer::from_status(StatusCode::CREATED).into_response(),
+         Self::UserCreated => {
+            Answer::from_status_message(StatusCode::CREATED, String::from("REGISTER SUCCESS"))
+               .into_response()
+         },
       }
    }
 }
