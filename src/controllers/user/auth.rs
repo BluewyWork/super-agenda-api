@@ -41,7 +41,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
       Err(_) => return Err(response::Error::DatabaseConnectionFail),
    };
 
-   if let Ok(bool) = verify_password(payload.password.to_string(), &user.password) {
+   if let Ok(bool) = verify_password(payload.password.to_string(), &user.hashed_password) {
       if !bool {
          return Err(response::Error::InvalidCredentials);
       }
@@ -94,11 +94,13 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
       },
    };
 
-   if let Err(_) = users_collection
-      .insert_one(payload.to_user(hashed_password), None)
-      .await
-   {
-      return Err(response::Error::DatabaseConnectionFail);
+   let user = match payload.to_user(hashed_password) {
+      Ok(user) => user,
+      Err(err) => return Err(err),
+   };
+
+   if let Err(_) = users_collection.insert_one(user, None).await {
+      return Err(response::Error::DatabaseStuff);
    }
 
    Ok(response::Success::UserCreated)

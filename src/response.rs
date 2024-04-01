@@ -93,6 +93,10 @@ pub enum Error {
    PasswordStuff,
    TokenStuff,
    DatabaseConnectionFail,
+   DatabaseStuff,
+   InvalidUsername(String),
+   InvalidPassword(String),
+   InvalidEmail(String),
 }
 
 impl IntoResponse for Error {
@@ -101,15 +105,31 @@ impl IntoResponse for Error {
          Self::InvalidCredentials
          | Self::UserNotFound
          | Self::UsernameOrEmailNotFound
-         | Self::EmailAlreadyTaken
-         | Self::UsernameAlreadyTaken
          | Self::PasswordStuff
          | Self::TokenStuff => {
-            Answer::from_status_message(StatusCode::FORBIDDEN, String::from("INVALID CREDENTIALS"))
+            Answer::from_status_message(StatusCode::CONFLICT, String::from("INVALID CREDENTIALS"))
                .into_response()
          },
-         Self::DatabaseConnectionFail => {
+         Self::EmailAlreadyTaken => {
+            Answer::from_status_message(StatusCode::CONFLICT, String::from("EMAIL ALREADY TAKEN"))
+               .into_response()
+         },
+         Self::UsernameAlreadyTaken => Answer::from_status_message(
+            StatusCode::FORBIDDEN,
+            String::from("USERNAME ALREADY TAKEN"),
+         )
+         .into_response(),
+         Self::DatabaseStuff | Self::DatabaseConnectionFail => {
             Answer::from_status(StatusCode::INTERNAL_SERVER_ERROR).into_response()
+         },
+         Self::InvalidEmail(msg) => {
+            Answer::from_status_message(StatusCode::UNPROCESSABLE_ENTITY, msg).into_response()
+         },
+         Self::InvalidUsername(msg) => {
+            Answer::from_status_message(StatusCode::UNPROCESSABLE_ENTITY, msg).into_response()
+         },
+         Self::InvalidPassword(msg) => {
+            Answer::from_status_message(StatusCode::UNPROCESSABLE_ENTITY, msg).into_response()
          },
       }
    }

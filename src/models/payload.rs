@@ -1,5 +1,7 @@
 use serde::Deserialize;
 
+use crate::response::Error;
+
 use super::schemas::{Phone, User};
 
 #[derive(Debug, Deserialize)]
@@ -20,14 +22,14 @@ pub struct RegisterPayload {
 }
 
 impl RegisterPayload {
-   pub fn to_user(self, hashed_password: String) -> User {
-      User {
-         display_name: self.display_name,
-         username: self.username,
-         password: hashed_password,
-         recovery_email: self.recovery_email,
-         email: self.email,
-         phone: self.phone,
-      }
+   pub fn to_user(self, hashed_password: String) -> Result<User, Error> {
+      User::from(
+         self.display_name,
+         self.username,
+         hashed_password,
+         self.recovery_email,
+         self.email,
+         self.phone,
+      )
    }
 }

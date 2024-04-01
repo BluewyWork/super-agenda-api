@@ -1,14 +1,60 @@
 use mongodb::bson::DateTime;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
+
+use crate::response::{self, Error};
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
    pub username: String,
    pub display_name: String,
-   pub password: String,
+   pub hashed_password: String,
    pub email: Option<String>,
    pub recovery_email: Option<String>,
    pub phone: Option<Phone>,
+}
+
+impl User {
+   pub fn from(
+      username: String,
+      display_name: String,
+      password: String,
+      email: Option<String>,
+      recovery_email: Option<String>,
+      phone: Option<Phone>,
+   ) -> Result<User, Error> {
+      let username_regex = Regex::new(r"^[a-z0-9_.]+$").unwrap();
+
+      if !username_regex.is_match(&username) {
+         return Err(response::Error::InvalidUsername(String::from(
+            "Username must be lowercase, alphanumeric and can contain _ and .",
+         )));
+      }
+
+      if password.len() < 5 {
+         return Err(response::Error::InvalidPassword(String::from(
+            "Password must be at least 5 characters long.",
+         )));
+      }
+
+      if let Some(email) = &email {
+         let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
+         if !email_regex.is_match(email) {
+            return Err(response::Error::InvalidEmail(String::from(
+               "Email format not recognized.",
+            )));
+         }
+      }
+
+      Ok(User {
+         username,
+         display_name,
+         hashed_password: password,
+         email,
+         recovery_email,
+         phone,
+      })
+   }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
