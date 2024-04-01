@@ -10,7 +10,6 @@ pub struct User {
    pub recovery_email: Option<String>,
    pub phone_number: Option<Phone>,
    pub display_name: String,
-   pub social_id: String,
 }
 
 impl User {
@@ -26,7 +25,6 @@ impl User {
          recovery_email: None,
          phone_number: None,
          display_name,
-         social_id: String::from(Uuid::new_v4()),
       }
    }
 }
