@@ -22,19 +22,28 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
 
    let users_collection = mongodb.collection::<schemas::User>("users");
 
-   let user_query = users_collection
-      .find_one(doc! { "username": &payload.username }, None)
-      .await;
+   // Use either email or username to find user.
+   let user_query = if let Some(email) = payload.email {
+      users_collection
+         .find_one(doc! { "email": email }, None)
+         .await
+   } else if let Some(username) = payload.username {
+      users_collection
+         .find_one(doc! { "username": username }, None)
+         .await
+   } else {
+      return Err(response::Error::UsernameOrEmailNotFound);
+   };
 
    let user = match user_query {
       Ok(Some(user)) => user,
-      Ok(None) => return Err(response::Error::LoginFail),
+      Ok(None) => return Err(response::Error::UserNotFound),
       Err(_) => return Err(response::Error::DatabaseConnectionFail),
    };
 
    if let Ok(bool) = verify_password(payload.password.to_string(), &user.password) {
       if !bool {
-         return Err(response::Error::LoginFail);
+         return Err(response::Error::InvalidCredentials);
       }
    } else {
       return Err(response::Error::PasswordStuff);
