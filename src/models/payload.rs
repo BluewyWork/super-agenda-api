@@ -4,7 +4,8 @@ use super::schemas::{Phone, User};
 
 #[derive(Debug, Deserialize)]
 pub struct LoginPayload {
-   pub username: String,
+   pub username: Option<String>,
+   pub email: Option<String>,
    pub password: String,
 }
 
