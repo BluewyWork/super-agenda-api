@@ -85,19 +85,32 @@ impl IntoResponse for Success {
 }
 
 pub enum Error {
-   LoginFail,
-   DatabaseConnectionFail,
-   PasswordStuff,
-   TokenStuff,
+   InvalidCredentials,
+   UserNotFound,
+   UsernameOrEmailNotFound,
    EmailAlreadyTaken,
    UsernameAlreadyTaken,
+   PasswordStuff,
+   TokenStuff,
+   DatabaseConnectionFail,
 }
 
 impl IntoResponse for Error {
    fn into_response(self) -> Response {
       match self {
-         Self::LoginFail => Answer::from_status(StatusCode::FORBIDDEN).into_response(),
-         _ => Answer::from_status(StatusCode::INTERNAL_SERVER_ERROR).into_response(),
+         Self::InvalidCredentials
+         | Self::UserNotFound
+         | Self::UsernameOrEmailNotFound
+         | Self::EmailAlreadyTaken
+         | Self::UsernameAlreadyTaken
+         | Self::PasswordStuff
+         | Self::TokenStuff => {
+            Answer::from_status_message(StatusCode::FORBIDDEN, String::from("INVALID CREDENTIALS"))
+               .into_response()
+         },
+         Self::DatabaseConnectionFail => {
+            Answer::from_status(StatusCode::INTERNAL_SERVER_ERROR).into_response()
+         },
       }
    }
 }
