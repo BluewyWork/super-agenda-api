@@ -1,15 +1,14 @@
 use mongodb::bson::DateTime;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
    pub username: String,
+   pub display_name: String,
    pub password: String,
    pub email: Option<String>,
    pub recovery_email: Option<String>,
    pub phone_number: Option<Phone>,
-   pub display_name: String,
 }
 
 impl User {
