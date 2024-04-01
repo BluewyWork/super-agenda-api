@@ -1,7 +1,4 @@
-use mongodb::{
-   bson::doc,
-   error::{ErrorKind, WriteFailure},
-};
+use mongodb::bson::doc;
 
 use crate::{
    models::{
@@ -61,6 +58,26 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
 
    let users_collection = mongodb.collection::<schemas::User>("users");
 
+   // Check for duplicate username.
+
+   if let Ok(Some(_)) = users_collection
+      .find_one(doc! {"username": &payload.username}, None)
+      .await
+   {
+      return Err(response::Error::UsernameAlreadyTaken);
+   }
+
+   // Check for duplicate email.
+
+   match &payload.email {
+      Some(email) => {
+         if let Ok(Some(_)) = users_collection.find_one(doc! {"email": email}, None).await {
+            return Err(response::Error::EmailAlreadyTaken);
+         }
+      },
+      None => {},
+   }
+
    let hashed_password = match hash_password(payload.password.to_string()) {
       Ok(password) => password,
       Err(_) => {
@@ -68,30 +85,10 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
       },
    };
 
-   if let Err(err) = users_collection
-      .insert_one(
-         schemas::User::from_username_password_display_name(
-            payload.username,
-            hashed_password,
-            payload.display_name,
-         ),
-         None,
-      )
+   if let Err(_) = users_collection
+      .insert_one(payload.to_user(hashed_password), None)
       .await
    {
-      // Specifically searchs for a duplicate key error
-      // and instead of parsing the error message and extracting
-      // the field which value is being duplicated
-      // we can infer that the culprit is the 'email' field
-      // since it is the only unique key this function handles.
-      if let ErrorKind::Write(write_failure) = *err.kind {
-         if let WriteFailure::WriteError(write_error) = write_failure {
-            if write_error.code == 11000 {
-               return Err(response::Error::EmailAlreadyInUse);
-            }
-         }
-      }
-
       return Err(response::Error::DatabaseConnectionFail);
    }
 

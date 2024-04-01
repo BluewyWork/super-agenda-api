@@ -89,7 +89,8 @@ pub enum Error {
    DatabaseConnectionFail,
    PasswordStuff,
    TokenStuff,
-   EmailAlreadyInUse,
+   EmailAlreadyTaken,
+   UsernameAlreadyTaken,
 }
 
 impl IntoResponse for Error {

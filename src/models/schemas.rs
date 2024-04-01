@@ -8,24 +8,7 @@ pub struct User {
    pub password: String,
    pub email: Option<String>,
    pub recovery_email: Option<String>,
-   pub phone_number: Option<Phone>,
-}
-
-impl User {
-   pub fn from_username_password_display_name(
-      username: String,
-      password: String,
-      display_name: String,
-   ) -> User {
-      User {
-         username,
-         password,
-         email: None,
-         recovery_email: None,
-         phone_number: None,
-         display_name,
-      }
-   }
+   pub phone: Option<Phone>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
