@@ -5,8 +5,8 @@ use axum::{
 };
 use serde_json::{json, to_value};
 
-use crate::utils::{extractor::Json, jwt::verify_token};
 use crate::response;
+use crate::utils::{extractor::Json, jwt::verify_token};
 
 #[allow(dead_code)]
 pub async fn middleware_guest_authentication(request: Request, next: Next) -> Response {
@@ -62,7 +62,7 @@ pub async fn middleware_success_response_mapper(response: Response) -> Response 
          let client_success_body = json!({
             "ok": true,
             "message": message,
-            "data": data
+            "data": data.unwrap_or(&json!({}))
          });
 
          (*status_code, Json(client_success_body)).into_response()
