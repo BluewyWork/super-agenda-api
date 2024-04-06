@@ -3,7 +3,10 @@ use axum::{
    response::{IntoResponse, Response},
    Json,
 };
+use serde::Serialize;
 use serde_json::{json, Value};
+
+use crate::models::schemas::Status;
 
 pub struct Answer {
    pub status: StatusCode,
@@ -62,28 +65,40 @@ impl IntoResponse for Answer {
 
 pub type Result = core::result::Result<Success, Error>;
 
+#[derive(Clone)]
 pub enum Success {
-   TokenCreated(String),
+   TokenCreated(Value),
    UserCreated,
 }
 
 impl IntoResponse for Success {
    fn into_response(self) -> Response {
+      let mut response = StatusCode::OK.into_response();
+
+      response.extensions_mut().insert(self);
+
+      response
+   }
+}
+
+impl Success {
+   pub fn client_status_and_success(&self) -> (StatusCode, ClientSuccess) {
       match self {
-         Self::TokenCreated(token) => Answer::from_status_message_data(
-            StatusCode::CREATED,
-            String::from("LOGIN SUCCESS"),
-            json!({ "token": token }),
-         )
-         .into_response(),
-         Self::UserCreated => {
-            Answer::from_status_message(StatusCode::CREATED, String::from("REGISTER SUCCESS"))
-               .into_response()
-         },
+         Self::TokenCreated(token) => (StatusCode::CREATED, ClientSuccess::Token(token.to_owned())),
+         _ => (StatusCode::OK, ClientSuccess::UserCreated),
       }
    }
 }
 
+#[serde(tag = "message", content = "data")]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Serialize, strum_macros::AsRefStr)]
+pub enum ClientSuccess {
+   UserCreated,
+   Token(Value),
+}
+
+#[derive(Clone, Debug, Serialize, strum_macros::AsRefStr)]
 pub enum Error {
    InvalidCredentials,
    UserNotFound,
@@ -94,43 +109,60 @@ pub enum Error {
    TokenStuff,
    DatabaseConnectionFail,
    DatabaseStuff,
-   InvalidUsername(String),
-   InvalidPassword(String),
-   InvalidEmail(String),
+   InvalidUsername,
+   InvalidPassword,
+   InvalidEmail,
+   TestError(String),
 }
 
 impl IntoResponse for Error {
    fn into_response(self) -> Response {
+      let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
+
+      response.extensions_mut().insert(self);
+
+      response
+   }
+}
+
+impl Error {
+   pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
       match self {
          Self::InvalidCredentials
          | Self::UserNotFound
          | Self::UsernameOrEmailNotFound
          | Self::PasswordStuff
-         | Self::TokenStuff => {
-            Answer::from_status_message(StatusCode::CONFLICT, String::from("INVALID CREDENTIALS"))
-               .into_response()
-         },
-         Self::EmailAlreadyTaken => {
-            Answer::from_status_message(StatusCode::CONFLICT, String::from("EMAIL ALREADY TAKEN"))
-               .into_response()
-         },
-         Self::UsernameAlreadyTaken => Answer::from_status_message(
-            StatusCode::FORBIDDEN,
-            String::from("USERNAME ALREADY TAKEN"),
-         )
-         .into_response(),
+         | Self::TokenStuff => (StatusCode::FORBIDDEN, ClientError::InvalidCredentials),
+         Self::EmailAlreadyTaken => (StatusCode::CONFLICT, ClientError::EmailAlreadyTaken),
+         Self::UsernameAlreadyTaken => (StatusCode::CONFLICT, ClientError::UsernameAlreadyTaken),
          Self::DatabaseStuff | Self::DatabaseConnectionFail => {
-            Answer::from_status(StatusCode::INTERNAL_SERVER_ERROR).into_response()
+            (StatusCode::INTERNAL_SERVER_ERROR, ClientError::ServerError)
          },
-         Self::InvalidEmail(msg) => {
-            Answer::from_status_message(StatusCode::UNPROCESSABLE_ENTITY, msg).into_response()
-         },
-         Self::InvalidUsername(msg) => {
-            Answer::from_status_message(StatusCode::UNPROCESSABLE_ENTITY, msg).into_response()
-         },
-         Self::InvalidPassword(msg) => {
-            Answer::from_status_message(StatusCode::UNPROCESSABLE_ENTITY, msg).into_response()
-         },
+         Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::InvalidEmail),
+         Self::InvalidUsername => (
+            StatusCode::UNPROCESSABLE_ENTITY,
+            ClientError::InvalidUsername,
+         ),
+         Self::InvalidPassword => (
+            StatusCode::UNPROCESSABLE_ENTITY,
+            ClientError::InvalidPassword,
+         ),
+         Self::TestError(string) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            ClientError::TestError(string.clone()),
+         ),
       }
    }
+}
+
+#[derive(Debug, strum_macros::AsRefStr)]
+pub enum ClientError {
+   InvalidCredentials,
+   EmailAlreadyTaken,
+   UsernameAlreadyTaken,
+   InvalidUsername,
+   InvalidEmail,
+   InvalidPassword,
+   ServerError,
+   TestError(String),
 }

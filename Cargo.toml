@@ -19,3 +19,4 @@ lazy_static = "1.4.0"
 tower-http = { version = "0.5.2", features = ["cors"] }
 chrono = "0.4.35"
 regex = "1.10.4"
+strum_macros = "0.26.2"

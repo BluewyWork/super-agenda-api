@@ -1,4 +1,5 @@
 use mongodb::bson::doc;
+use serde_json::json;
 
 use crate::{
    models::{
@@ -54,7 +55,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
       Err(_) => return Err(response::Error::TokenStuff),
    };
 
-   Ok(response::Success::TokenCreated(token))
+   Ok(response::Success::TokenCreated(json!({"token": token})))
 }
 
 pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result {

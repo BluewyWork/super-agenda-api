@@ -26,23 +26,17 @@ impl User {
       let username_regex = Regex::new(r"^[a-z0-9_.]+$").unwrap();
 
       if !username_regex.is_match(&username) {
-         return Err(response::Error::InvalidUsername(String::from(
-            "Username must be lowercase, alphanumeric and can contain _ and .",
-         )));
+         return Err(response::Error::InvalidUsername);
       }
 
       if password.len() < 5 {
-         return Err(response::Error::InvalidPassword(String::from(
-            "Password must be at least 5 characters long.",
-         )));
+         return Err(response::Error::InvalidPassword);
       }
 
       if let Some(email) = &email {
          let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
          if !email_regex.is_match(email) {
-            return Err(response::Error::InvalidEmail(String::from(
-               "Email format not recognized.",
-            )));
+            return Err(response::Error::InvalidEmail);
          }
       }
 
