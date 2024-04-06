@@ -13,8 +13,7 @@ pub enum Error {
    UsernameAlreadyTaken,
    PasswordStuff,
    TokenStuff,
-   DatabaseConnectionFail,
-   DatabaseStuff,
+   MongoDBStuff,
    InvalidUsername,
    InvalidPassword,
    InvalidEmail,
@@ -40,9 +39,7 @@ impl Error {
          | Self::TokenStuff => (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS),
          Self::EmailAlreadyTaken => (StatusCode::CONFLICT, ClientError::EMAIL_ALREADY_TAKEN),
          Self::UsernameAlreadyTaken => (StatusCode::CONFLICT, ClientError::USERNAME_ALREADY_TAKEN),
-         Self::DatabaseStuff | Self::DatabaseConnectionFail => {
-            (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR)
-         },
+         Self::MongoDBStuff => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
          Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::INVALID_EMAIL),
          Self::InvalidUsername => (
             StatusCode::UNPROCESSABLE_ENTITY,

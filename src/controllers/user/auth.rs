@@ -18,7 +18,7 @@ use crate::{
 pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
    let mongodb = match mongodb_connection().await {
       Ok(client) => client,
-      Err(_) => return Err(Error::DatabaseConnectionFail),
+      Err(_) => return Err(Error::MongoDBStuff),
    };
 
    let users_collection = mongodb.collection::<schemas::User>("users");
@@ -39,7 +39,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
    let user = match user_query {
       Ok(Some(user)) => user,
       Ok(None) => return Err(Error::UserNotFound),
-      Err(_) => return Err(Error::DatabaseConnectionFail),
+      Err(_) => return Err(Error::MongoDBStuff),
    };
 
    if let Ok(bool) = verify_password(payload.password.to_string(), &user.hashed_password) {
@@ -62,14 +62,13 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    let mongodb = match mongodb_connection().await {
       Ok(client) => client,
       Err(_) => {
-         return Err(Error::DatabaseConnectionFail);
+         return Err(Error::MongoDBStuff);
       },
    };
 
    let users_collection = mongodb.collection::<schemas::User>("users");
 
    // Check for duplicate username.
-
    if let Ok(Some(_)) = users_collection
       .find_one(doc! {"username": &payload.username}, None)
       .await
@@ -78,7 +77,6 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    }
 
    // Check for duplicate email.
-
    match &payload.email {
       Some(email) => {
          if let Ok(Some(_)) = users_collection.find_one(doc! {"email": email}, None).await {
@@ -101,7 +99,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    };
 
    if let Err(_) = users_collection.insert_one(user, None).await {
-      return Err(Error::DatabaseStuff);
+      return Err(Error::MongoDBStuff);
    }
 
    Ok(Success::User)
