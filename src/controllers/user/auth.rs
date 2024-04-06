@@ -8,15 +8,15 @@ use crate::{
    },
    response::{error::Error, success::Success, Result},
    utils::{
-      database::mongodb_connection,
       extractor::Json,
       jwt::create_token,
+      mongodb::database,
       password_stuff::{hash_password, verify_password},
    },
 };
 
 pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
-   let mongodb = match mongodb_connection().await {
+   let mongodb = match database().await {
       Ok(client) => client,
       Err(_) => return Err(Error::MongoDBStuff),
    };
@@ -59,7 +59,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
 }
 
 pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
-   let mongodb = match mongodb_connection().await {
+   let mongodb = match database().await {
       Ok(client) => client,
       Err(_) => {
          return Err(Error::MongoDBStuff);

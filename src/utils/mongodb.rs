@@ -5,7 +5,7 @@ use crate::utils::{
    log::plog,
 };
 
-pub async fn mongodb_connection() -> Result<Database, ()> {
+pub async fn database() -> Result<Database, ()> {
    let client_options = match ClientOptions::parse(MONGO_URL.to_string()).await {
       Ok(opt) => opt,
       Err(err) => {
