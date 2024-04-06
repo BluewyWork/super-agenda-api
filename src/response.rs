@@ -6,7 +6,6 @@ use axum::{
 use serde::Serialize;
 use serde_json::{json, Value};
 
-
 pub struct Answer {
    pub status: StatusCode,
    pub message: String,
@@ -89,9 +88,9 @@ impl Success {
    }
 }
 
-#[serde(tag = "message", content = "data")]
 #[allow(non_camel_case_types)]
 #[derive(Debug, Serialize, strum_macros::AsRefStr)]
+#[serde(tag = "message", content = "data")]
 pub enum ClientSuccess {
    UserCreated,
    Token(Value),
