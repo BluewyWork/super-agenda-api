@@ -9,7 +9,7 @@ use crate::response::{error::Error, success::Success};
 use crate::utils::{extractor::Json, jwt::verify_token};
 
 #[allow(dead_code)]
-pub async fn middleware_guest_authentication(request: Request, next: Next) -> Response {
+pub async fn authenticate_guest(request: Request, next: Next) -> Response {
    let token = match request.headers().get("Authorization") {
       Some(token_wrapped) => match token_wrapped.to_str() {
          Ok(token) => token.to_string(),
@@ -29,7 +29,7 @@ pub async fn middleware_guest_authentication(request: Request, next: Next) -> Re
    next.run(request).await
 }
 
-pub async fn middleware_error_response_mapper(response: Response) -> Response {
+pub async fn map_response_from_error(response: Response) -> Response {
    let service_error = response.extensions().get::<Error>();
    let client_status_error = service_error.map(|se| se.client_status_and_error());
 
@@ -48,7 +48,7 @@ pub async fn middleware_error_response_mapper(response: Response) -> Response {
    error_reponse.unwrap_or(response)
 }
 
-pub async fn middleware_success_response_mapper(response: Response) -> Response {
+pub async fn map_response_from_success(response: Response) -> Response {
    let service_success = response.extensions().get::<Success>();
    let client_status_success = service_success.map(|ss| ss.client_status_and_success());
 

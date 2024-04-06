@@ -11,7 +11,7 @@ use crate::{
       database::mongodb_connection,
       extractor::Json,
       jwt::create_token,
-      security::{hash_password, verify_password},
+      password_stuff::{hash_password, verify_password},
    },
 };
 
@@ -55,7 +55,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
       Err(_) => return Err(Error::TokenStuff),
    };
 
-   Ok(Success::TokenCreated(json!({"token": token})))
+   Ok(Success::Token(json!({"token": token})))
 }
 
 pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
@@ -104,5 +104,5 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
       return Err(Error::DatabaseStuff);
    }
 
-   Ok(Success::UserCreated)
+   Ok(Success::User)
 }

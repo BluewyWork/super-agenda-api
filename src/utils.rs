@@ -3,4 +3,4 @@ pub mod database;
 pub mod extractor;
 pub mod jwt;
 pub mod log;
-pub mod security;
+pub mod password_stuff;
