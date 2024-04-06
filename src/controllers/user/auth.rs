@@ -6,19 +6,19 @@ use crate::{
       payload::{LoginPayload, RegisterPayload},
       schemas,
    },
-   response,
-   utils::database::mongodb_connection,
-   utils::extractor::Json,
+   response::{error::Error, success::Success, Result},
    utils::{
+      database::mongodb_connection,
+      extractor::Json,
       jwt::create_token,
       security::{hash_password, verify_password},
    },
 };
 
-pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
+pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
    let mongodb = match mongodb_connection().await {
       Ok(client) => client,
-      Err(_) => return Err(response::Error::DatabaseConnectionFail),
+      Err(_) => return Err(Error::DatabaseConnectionFail),
    };
 
    let users_collection = mongodb.collection::<schemas::User>("users");
@@ -33,36 +33,36 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> response::Result {
          .find_one(doc! { "username": username }, None)
          .await
    } else {
-      return Err(response::Error::UsernameOrEmailNotFound);
+      return Err(Error::UsernameOrEmailNotFound);
    };
 
    let user = match user_query {
       Ok(Some(user)) => user,
-      Ok(None) => return Err(response::Error::UserNotFound),
-      Err(_) => return Err(response::Error::DatabaseConnectionFail),
+      Ok(None) => return Err(Error::UserNotFound),
+      Err(_) => return Err(Error::DatabaseConnectionFail),
    };
 
    if let Ok(bool) = verify_password(payload.password.to_string(), &user.hashed_password) {
       if !bool {
-         return Err(response::Error::InvalidCredentials);
+         return Err(Error::InvalidCredentials);
       }
    } else {
-      return Err(response::Error::PasswordStuff);
+      return Err(Error::PasswordStuff);
    }
 
    let token = match create_token(user.username) {
       Ok(token) => token,
-      Err(_) => return Err(response::Error::TokenStuff),
+      Err(_) => return Err(Error::TokenStuff),
    };
 
-   Ok(response::Success::TokenCreated(json!({"token": token})))
+   Ok(Success::TokenCreated(json!({"token": token})))
 }
 
-pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result {
+pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    let mongodb = match mongodb_connection().await {
       Ok(client) => client,
       Err(_) => {
-         return Err(response::Error::DatabaseConnectionFail);
+         return Err(Error::DatabaseConnectionFail);
       },
    };
 
@@ -74,7 +74,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
       .find_one(doc! {"username": &payload.username}, None)
       .await
    {
-      return Err(response::Error::UsernameAlreadyTaken);
+      return Err(Error::UsernameAlreadyTaken);
    }
 
    // Check for duplicate email.
@@ -82,7 +82,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
    match &payload.email {
       Some(email) => {
          if let Ok(Some(_)) = users_collection.find_one(doc! {"email": email}, None).await {
-            return Err(response::Error::EmailAlreadyTaken);
+            return Err(Error::EmailAlreadyTaken);
          }
       },
       None => {},
@@ -91,7 +91,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
    let hashed_password = match hash_password(payload.password.to_string()) {
       Ok(password) => password,
       Err(_) => {
-         return Err(response::Error::PasswordStuff);
+         return Err(Error::PasswordStuff);
       },
    };
 
@@ -101,8 +101,8 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> response::Result 
    };
 
    if let Err(_) = users_collection.insert_one(user, None).await {
-      return Err(response::Error::DatabaseStuff);
+      return Err(Error::DatabaseStuff);
    }
 
-   Ok(response::Success::UserCreated)
+   Ok(Success::UserCreated)
 }

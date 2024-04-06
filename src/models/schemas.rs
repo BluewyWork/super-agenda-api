@@ -2,7 +2,7 @@ use mongodb::bson::DateTime;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
-use crate::response::{self, Error};
+use crate::response::error::Error;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
@@ -26,17 +26,17 @@ impl User {
       let username_regex = Regex::new(r"^[a-z0-9_.]+$").unwrap();
 
       if !username_regex.is_match(&username) {
-         return Err(response::Error::InvalidUsername);
+         return Err(Error::InvalidUsername);
       }
 
       if password.len() < 5 {
-         return Err(response::Error::InvalidPassword);
+         return Err(Error::InvalidPassword);
       }
 
       if let Some(email) = &email {
          let email_regex = Regex::new(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$").unwrap();
          if !email_regex.is_match(email) {
-            return Err(response::Error::InvalidEmail);
+            return Err(Error::InvalidEmail);
          }
       }
 

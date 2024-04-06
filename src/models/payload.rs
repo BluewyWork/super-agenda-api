@@ -1,6 +1,8 @@
 use serde::Deserialize;
 
-use crate::response::Error;
+use error::Error;
+
+use crate::response::error;
 
 use super::schemas::{Phone, User};
 

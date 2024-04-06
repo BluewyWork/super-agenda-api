@@ -5,7 +5,7 @@ use axum::{
 };
 use serde_json::{json, to_value};
 
-use crate::response;
+use crate::response::{error::Error, success::Success};
 use crate::utils::{extractor::Json, jwt::verify_token};
 
 #[allow(dead_code)]
@@ -13,14 +13,14 @@ pub async fn middleware_guest_authentication(request: Request, next: Next) -> Re
    let token = match request.headers().get("Authorization") {
       Some(token_wrapped) => match token_wrapped.to_str() {
          Ok(token) => token.to_string(),
-         Err(_) => return response::Error::TokenStuff.into_response(),
+         Err(_) => return Error::TokenStuff.into_response(),
       },
-      None => return response::Error::TokenStuff.into_response(),
+      None => return Error::TokenStuff.into_response(),
    };
 
    let jwt_payload = match verify_token(token) {
       Ok(claims) => claims,
-      Err(_) => return response::Error::TokenStuff.into_response(),
+      Err(_) => return Error::TokenStuff.into_response(),
    };
 
    let mut request = request;
@@ -30,7 +30,7 @@ pub async fn middleware_guest_authentication(request: Request, next: Next) -> Re
 }
 
 pub async fn middleware_error_response_mapper(response: Response) -> Response {
-   let service_error = response.extensions().get::<response::Error>();
+   let service_error = response.extensions().get::<Error>();
    let client_status_error = service_error.map(|se| se.client_status_and_error());
 
    let error_reponse = client_status_error
@@ -49,7 +49,7 @@ pub async fn middleware_error_response_mapper(response: Response) -> Response {
 }
 
 pub async fn middleware_success_response_mapper(response: Response) -> Response {
-   let service_success = response.extensions().get::<response::Success>();
+   let service_success = response.extensions().get::<Success>();
    let client_status_success = service_success.map(|ss| ss.client_status_and_success());
 
    let success_response = client_status_success
