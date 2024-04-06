@@ -1,7 +1,7 @@
 use mongodb::{options::ClientOptions, Client, Database};
 
 use crate::utils::{
-   config::{MONGO_DB, MONGO_URL},
+   constants::{MONGO_DB, MONGO_URL},
    log::plog,
 };
 
