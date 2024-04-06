@@ -1,4 +1,4 @@
-use axum::{middleware::map_response, routing::get, Router};
+use axum::Router;
 use tokio::net::TcpListener;
 
 use crate::{
@@ -30,7 +30,9 @@ async fn main() {
       .layer(axum::middleware::map_response(
          middleware_error_response_mapper,
       ))
-      .layer(axum::middleware::map_response(middleware::middleware_success_response_mapper));
+      .layer(axum::middleware::map_response(
+         middleware::middleware_success_response_mapper,
+      ));
 
    if let Err(err) = axum::serve(listener, app).await {
       plog(format!("{}", err), "main".to_string(), true);

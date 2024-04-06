@@ -6,7 +6,6 @@ use axum::{
 use serde::Serialize;
 use serde_json::{json, Value};
 
-use crate::models::schemas::Status;
 
 pub struct Answer {
    pub status: StatusCode,
