@@ -110,7 +110,6 @@ pub enum Error {
    InvalidUsername,
    InvalidPassword,
    InvalidEmail,
-   TestError(String),
 }
 
 impl IntoResponse for Error {
@@ -145,10 +144,6 @@ impl Error {
             StatusCode::UNPROCESSABLE_ENTITY,
             ClientError::InvalidPassword,
          ),
-         Self::TestError(string) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            ClientError::TestError(string.clone()),
-         ),
       }
    }
 }
@@ -162,5 +157,4 @@ pub enum ClientError {
    InvalidEmail,
    InvalidPassword,
    ServerError,
-   TestError(String),
 }
