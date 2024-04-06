@@ -37,32 +37,33 @@ impl Error {
          | Self::UserNotFound
          | Self::UsernameOrEmailNotFound
          | Self::PasswordStuff
-         | Self::TokenStuff => (StatusCode::FORBIDDEN, ClientError::InvalidCredentials),
-         Self::EmailAlreadyTaken => (StatusCode::CONFLICT, ClientError::EmailAlreadyTaken),
-         Self::UsernameAlreadyTaken => (StatusCode::CONFLICT, ClientError::UsernameAlreadyTaken),
+         | Self::TokenStuff => (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS),
+         Self::EmailAlreadyTaken => (StatusCode::CONFLICT, ClientError::EMAIL_ALREADY_TAKEN),
+         Self::UsernameAlreadyTaken => (StatusCode::CONFLICT, ClientError::USERNAME_ALREADY_TAKEN),
          Self::DatabaseStuff | Self::DatabaseConnectionFail => {
-            (StatusCode::INTERNAL_SERVER_ERROR, ClientError::ServerError)
+            (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR)
          },
-         Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::InvalidEmail),
+         Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::INVALID_EMAIL),
          Self::InvalidUsername => (
             StatusCode::UNPROCESSABLE_ENTITY,
-            ClientError::InvalidUsername,
+            ClientError::INVALID_USERNAME,
          ),
          Self::InvalidPassword => (
             StatusCode::UNPROCESSABLE_ENTITY,
-            ClientError::InvalidPassword,
+            ClientError::INVALID_PASSWORD,
          ),
       }
    }
 }
 
 #[derive(Debug, strum_macros::AsRefStr)]
+#[allow(non_camel_case_types)]
 pub enum ClientError {
-   InvalidCredentials,
-   EmailAlreadyTaken,
-   UsernameAlreadyTaken,
-   InvalidUsername,
-   InvalidEmail,
-   InvalidPassword,
-   ServerError,
+   INVALID_CREDENTIALS,
+   EMAIL_ALREADY_TAKEN,
+   USERNAME_ALREADY_TAKEN,
+   INVALID_USERNAME,
+   INVALID_EMAIL,
+   INVALID_PASSWORD,
+   SERVER_ERROR,
 }

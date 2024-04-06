@@ -24,8 +24,11 @@ impl IntoResponse for Success {
 impl Success {
    pub fn client_status_and_success(&self) -> (StatusCode, ClientSuccess) {
       match self {
-         Self::Token(token) => (StatusCode::CREATED, ClientSuccess::Login(token.to_owned())),
-         _ => (StatusCode::OK, ClientSuccess::Register),
+         Self::Token(token) => (
+            StatusCode::CREATED,
+            ClientSuccess::LOGGED_IN(token.to_owned()),
+         ),
+         _ => (StatusCode::OK, ClientSuccess::REGISTERED),
       }
    }
 }
@@ -34,6 +37,6 @@ impl Success {
 #[derive(Debug, Serialize, strum_macros::AsRefStr)]
 #[serde(tag = "message", content = "data")]
 pub enum ClientSuccess {
-   Register,
-   Login(Value),
+   REGISTERED,
+   LOGGED_IN(Value),
 }
