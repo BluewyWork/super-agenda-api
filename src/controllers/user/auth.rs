@@ -4,7 +4,7 @@ use serde_json::json;
 use crate::{
    models::{
       payload::{LoginPayload, RegisterPayload},
-      schemas,
+      schemas::User,
    },
    response::{error::Error, success::Success, Result},
    utils::{
@@ -18,10 +18,9 @@ use crate::{
 pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
    let mongodb = database().await?;
 
-   let users_collection = mongodb.collection::<schemas::User>("users");
+   let users_collection = mongodb.collection::<User>("users");
 
-   // Use either email or username to find user.
-   let user_query = if let Some(email) = payload.email {
+   let find_one_user = if let Some(email) = payload.email {
       users_collection
          .find_one(doc! { "email": email }, None)
          .await
@@ -33,15 +32,16 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
       return Err(Error::UsernameOrEmailNotFound);
    };
 
-   let user = match user_query {
+   let user = match find_one_user {
       Ok(Some(user)) => user,
       Ok(None) => return Err(Error::MongoDBUserNotFound),
       Err(_) => return Err(Error::MongoDBError),
    };
 
-   let password_ok = is_valid_password(payload.password.to_string(), &user.hashed_password)?;
+   let password_validation =
+      is_valid_password(payload.password.to_string(), &user.hashed_password)?;
 
-   if !password_ok {
+   if !password_validation {
       return Err(Error::PasswordNotValid);
    }
 
@@ -53,7 +53,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
 pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    let mongodb = database().await?;
 
-   let users_collection = mongodb.collection::<schemas::User>("users");
+   let users_collection = mongodb.collection::<User>("users");
 
    // Check for duplicate username.
    if let Ok(Some(_)) = users_collection
@@ -64,13 +64,11 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    }
 
    // Check for duplicate email.
-   match &payload.email {
-      Some(email) => {
-         if let Ok(Some(_)) = users_collection.find_one(doc! {"email": email}, None).await {
-            return Err(Error::EmailAlreadyTaken);
-         }
-      },
-      None => {},
+   if let Ok(Some(_)) = users_collection
+      .find_one(doc! {"email": &payload.email}, None)
+      .await
+   {
+      return Err(Error::EmailAlreadyTaken);
    }
 
    let hashed_password = hash_password(payload.password.to_string())?;
