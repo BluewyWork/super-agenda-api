@@ -8,7 +8,6 @@ use serde_json::{json, to_value};
 use crate::response::{error::Error, success::Success};
 use crate::utils::{extractor::Json, jwt::verify_token};
 
-#[allow(dead_code)]
 pub async fn authenticate_guest(request: Request, next: Next) -> Response {
    let token = match request.headers().get("Authorization") {
       Some(token_wrapped) => match token_wrapped.to_str() {
