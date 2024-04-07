@@ -1,10 +1,7 @@
 use serde::Deserialize;
 
-use error::Error;
-
-use crate::response::error;
-
 use super::schemas::{Phone, User};
+use crate::response::error::Error;
 
 #[derive(Debug, Deserialize)]
 pub struct LoginPayload {

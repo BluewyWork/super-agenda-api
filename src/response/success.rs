@@ -28,7 +28,7 @@ impl Success {
             StatusCode::CREATED,
             ClientSuccess::LOGGED_IN(token.to_owned()),
          ),
-         _ => (StatusCode::OK, ClientSuccess::REGISTERED),
+         Self::Register => (StatusCode::OK, ClientSuccess::REGISTERED),
       }
    }
 }

@@ -2,24 +2,27 @@ use axum::{
    http::StatusCode,
    response::{IntoResponse, Response},
 };
+use mongodb::Client;
 use serde::Serialize;
+
+use crate::models::schemas::Status;
 
 #[derive(Clone, Debug, Serialize, strum_macros::AsRefStr)]
 pub enum Error {
-   MongoDBUserNotFound,
-   UsernameOrEmailNotFound,
-   EmailAlreadyTaken,
-   UsernameAlreadyTaken,
-   PasswordNotValid,
-   PasswordHashError,
-   PasswordVerificationError,
+   PayloadUsernameOrEmailNotFound,
+   PasswordIsWrong,
+   PasswordHashingFail,
+   PasswordVerificationFail,
    TokenNotFound,
-   TokenNotVerified,
-   TokenNotCreated,
-   MongoDBParserError,
+   TokenInvalid,
+   TokenCreationFail,
+   MongoDBDuplicateEmail,
+   MongoDBDuplicateUsername,
+   MongoDBUserNotFound,
+   MongoDBParserFail,
    MongoDBNoClient,
-   MongoDBInsertError,
-   MongoDBError,
+   MongoDBInsertFail,
+   MongoDBFail,
    InvalidUsername,
    InvalidPassword,
    InvalidEmail,
@@ -39,21 +42,41 @@ impl IntoResponse for Error {
 impl Error {
    pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
       match self {
-         Self::MongoDBUserNotFound | Self::UsernameOrEmailNotFound => {
-            (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS)
-         },
-         Self::EmailAlreadyTaken => (StatusCode::CONFLICT, ClientError::EMAIL_ALREADY_TAKEN),
-         Self::UsernameAlreadyTaken => (StatusCode::CONFLICT, ClientError::USERNAME_ALREADY_TAKEN),
+         Self::MongoDBDuplicateEmail => (StatusCode::CONFLICT, ClientError::UNAVAILABLE_EMAIL),
          Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::INVALID_EMAIL),
+         Error::TokenNotFound => (StatusCode::BAD_REQUEST, ClientError::MISSING_TOKEN),
+         Error::TokenInvalid => (StatusCode::FORBIDDEN, ClientError::INVALID_TOKEN),
+
+         Self::PayloadUsernameOrEmailNotFound => {
+            (StatusCode::BAD_REQUEST, ClientError::INVALID_CREDENTIALS)
+         },
+
+         Self::MongoDBDuplicateUsername => {
+            (StatusCode::CONFLICT, ClientError::UNAVAILABLE_USERNAME)
+         },
+
          Self::InvalidUsername => (
             StatusCode::UNPROCESSABLE_ENTITY,
             ClientError::INVALID_USERNAME,
          ),
+
          Self::InvalidPassword => (
             StatusCode::UNPROCESSABLE_ENTITY,
             ClientError::INVALID_PASSWORD,
          ),
-         _ => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
+
+         Self::MongoDBUserNotFound | Self::PasswordIsWrong => {
+            (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS)
+         },
+
+         Error::TokenCreationFail
+         | Error::MongoDBParserFail
+         | Error::MongoDBNoClient
+         | Error::MongoDBInsertFail
+         | Error::MongoDBFail
+         | Self::PasswordVerificationFail
+         | Self::PasswordHashingFail
+         | Error::NumberOverflow => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
       }
    }
 }
@@ -61,9 +84,11 @@ impl Error {
 #[derive(Debug, strum_macros::AsRefStr)]
 #[allow(non_camel_case_types)]
 pub enum ClientError {
+   UNAVAILABLE_EMAIL,
+   UNAVAILABLE_USERNAME,
+   MISSING_TOKEN,
+   INVALID_TOKEN,
    INVALID_CREDENTIALS,
-   EMAIL_ALREADY_TAKEN,
-   USERNAME_ALREADY_TAKEN,
    INVALID_USERNAME,
    INVALID_EMAIL,
    INVALID_PASSWORD,

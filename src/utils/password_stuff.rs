@@ -9,11 +9,11 @@ pub fn hash_password(password: String) -> Result<String, Error> {
          "security".to_string(),
          true,
       );
-      Error::PasswordHashError
+      Error::PasswordHashingError
    })
 }
 
-pub fn is_valid_password(password: String, hash: &str) -> Result<bool, Error> {
+pub fn matches(password: String, hash: &str) -> Result<bool, Error> {
    bcrypt::verify(password, hash).map_err(|_| {
       plog(
          "unable to verify hashed password".to_string(),

@@ -11,7 +11,7 @@ use crate::{
       extractor::Json,
       jwt::new_token,
       mongo::database,
-      password_stuff::{hash_password, is_valid_password},
+      password_stuff::{hash_password, matches},
    },
 };
 
@@ -29,20 +29,20 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
          .find_one(doc! { "username": username }, None)
          .await
    } else {
-      return Err(Error::UsernameOrEmailNotFound);
+      return Err(Error::PayloadUsernameOrEmailNotFound);
    };
 
    let user = match find_one_user {
       Ok(Some(user)) => user,
       Ok(None) => return Err(Error::MongoDBUserNotFound),
-      Err(_) => return Err(Error::MongoDBError),
+      Err(_) => return Err(Error::MongoDBFail),
    };
 
-   let password_validation =
-      is_valid_password(payload.password.to_string(), &user.hashed_password)?;
+   let password_matched =
+      matches(payload.password.to_string(), &user.hashed_password)?;
 
-   if !password_validation {
-      return Err(Error::PasswordNotValid);
+   if !password_matched {
+      return Err(Error::PasswordIsWrong);
    }
 
    let token = new_token(user.username)?;
@@ -60,7 +60,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
       .find_one(doc! {"username": &payload.username}, None)
       .await
    {
-      return Err(Error::UsernameAlreadyTaken);
+      return Err(Error::MongoDBDuplicateUsername);
    }
 
    // Check for duplicate email.
@@ -68,7 +68,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
       .find_one(doc! {"email": &payload.email}, None)
       .await
    {
-      return Err(Error::EmailAlreadyTaken);
+      return Err(Error::MongoDBDuplicateEmail);
    }
 
    let hashed_password = hash_password(payload.password.to_string())?;

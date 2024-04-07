@@ -41,7 +41,7 @@ pub fn new_token(username: String) -> Result<String, Error> {
       Ok(token) => Ok(token),
       Err(err) => {
          plog(format!("{:?}", err.kind()), "jwt".to_string(), true);
-         Err(Error::TokenNotCreated)
+         Err(Error::TokenCreationError)
       },
    }
 }
@@ -55,7 +55,7 @@ pub fn verify_token(token: String) -> Result<Claims, Error> {
       Ok(token_data) => Ok(token_data.claims),
       Err(err) => {
          plog(format!("{:?}", err.kind()), "jwt".to_string(), true);
-         Err(Error::TokenNotVerified)
+         Err(Error::TokenInvalid)
       },
    }
 }
