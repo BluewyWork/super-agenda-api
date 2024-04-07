@@ -6,21 +6,20 @@ use serde::Serialize;
 
 #[derive(Clone, Debug, Serialize, strum_macros::AsRefStr)]
 pub enum Error {
-   InvalidCredentials,
-   UserNotFound,
+   MongoDBUserNotFound,
    UsernameOrEmailNotFound,
    EmailAlreadyTaken,
    UsernameAlreadyTaken,
-   PasswordStuff,
+   PasswordNotValid,
    PasswordHashError,
    PasswordVerificationError,
-   TokenStuff,
+   TokenNotFound,
    TokenNotVerified,
    TokenNotCreated,
-   TokenNotFound,
-   MongoDBStuff,
    MongoDBParserError,
    MongoDBNoClient,
+   MongoDBInsertError,
+   MongoDBError,
    InvalidUsername,
    InvalidPassword,
    InvalidEmail,
@@ -40,14 +39,11 @@ impl IntoResponse for Error {
 impl Error {
    pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
       match self {
-         Self::InvalidCredentials
-         | Self::UserNotFound
-         | Self::UsernameOrEmailNotFound
-         | Self::PasswordStuff
-         | Self::TokenStuff => (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS),
+         Self::MongoDBUserNotFound | Self::UsernameOrEmailNotFound => {
+            (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS)
+         },
          Self::EmailAlreadyTaken => (StatusCode::CONFLICT, ClientError::EMAIL_ALREADY_TAKEN),
          Self::UsernameAlreadyTaken => (StatusCode::CONFLICT, ClientError::USERNAME_ALREADY_TAKEN),
-         Self::MongoDBStuff => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
          Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::INVALID_EMAIL),
          Self::InvalidUsername => (
             StatusCode::UNPROCESSABLE_ENTITY,
@@ -57,6 +53,7 @@ impl Error {
             StatusCode::UNPROCESSABLE_ENTITY,
             ClientError::INVALID_PASSWORD,
          ),
+         _ => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
       }
    }
 }

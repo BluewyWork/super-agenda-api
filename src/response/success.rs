@@ -7,8 +7,8 @@ use serde_json::Value;
 
 #[derive(Clone)]
 pub enum Success {
-   Token(Value),
-   User,
+   Login(Value),
+   Register,
 }
 
 impl IntoResponse for Success {
@@ -24,7 +24,7 @@ impl IntoResponse for Success {
 impl Success {
    pub fn client_status_and_success(&self) -> (StatusCode, ClientSuccess) {
       match self {
-         Self::Token(token) => (
+         Self::Login(token) => (
             StatusCode::CREATED,
             ClientSuccess::LOGGED_IN(token.to_owned()),
          ),

@@ -11,15 +11,12 @@ use crate::{
       extractor::Json,
       jwt::new_token,
       mongo::database,
-      password_stuff::{hash_password, verify_password},
+      password_stuff::{hash_password, is_valid_password},
    },
 };
 
 pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
-   let mongodb = match database().await {
-      Ok(client) => client,
-      Err(_) => return Err(Error::MongoDBStuff),
-   };
+   let mongodb = database().await?;
 
    let users_collection = mongodb.collection::<schemas::User>("users");
 
@@ -38,33 +35,23 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
 
    let user = match user_query {
       Ok(Some(user)) => user,
-      Ok(None) => return Err(Error::UserNotFound),
-      Err(_) => return Err(Error::MongoDBStuff),
+      Ok(None) => return Err(Error::MongoDBUserNotFound),
+      Err(_) => return Err(Error::MongoDBError),
    };
 
-   if let Ok(bool) = verify_password(payload.password.to_string(), &user.hashed_password) {
-      if !bool {
-         return Err(Error::InvalidCredentials);
-      }
-   } else {
-      return Err(Error::PasswordStuff);
+   let password_ok = is_valid_password(payload.password.to_string(), &user.hashed_password)?;
+
+   if !password_ok {
+      return Err(Error::PasswordNotValid);
    }
 
-   let token = match new_token(user.username) {
-      Ok(token) => token,
-      Err(_) => return Err(Error::TokenStuff),
-   };
+   let token = new_token(user.username)?;
 
-   Ok(Success::Token(json!({"token": token})))
+   Ok(Success::Login(json!({"token": token})))
 }
 
 pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
-   let mongodb = match database().await {
-      Ok(client) => client,
-      Err(_) => {
-         return Err(Error::MongoDBStuff);
-      },
-   };
+   let mongodb = database().await?;
 
    let users_collection = mongodb.collection::<schemas::User>("users");
 
@@ -86,21 +73,13 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
       None => {},
    }
 
-   let hashed_password = match hash_password(payload.password.to_string()) {
-      Ok(password) => password,
-      Err(_) => {
-         return Err(Error::PasswordStuff);
-      },
-   };
+   let hashed_password = hash_password(payload.password.to_string())?;
 
-   let user = match payload.to_user(hashed_password) {
-      Ok(user) => user,
-      Err(err) => return Err(err),
-   };
+   let user = payload.to_user(hashed_password)?;
 
    if let Err(_) = users_collection.insert_one(user, None).await {
-      return Err(Error::MongoDBStuff);
+      return Err(Error::MongoDBInsertError);
    }
 
-   Ok(Success::User)
+   Ok(Success::Register)
 }
