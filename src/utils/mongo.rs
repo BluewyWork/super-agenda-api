@@ -1,16 +1,19 @@
 use mongodb::{options::ClientOptions, Client, Database};
 
-use crate::utils::{
-   constants::{MONGO_DB, MONGO_URL},
-   log::plog,
+use crate::{
+   response::error::Error,
+   utils::{
+      constants::{MONGO_DB, MONGO_URL},
+      log::plog,
+   },
 };
 
-pub async fn database() -> Result<Database, ()> {
+pub async fn database() -> Result<Database, Error> {
    let client_options = match ClientOptions::parse(MONGO_URL.to_string()).await {
       Ok(opt) => opt,
       Err(err) => {
          plog(err.kind.to_string(), "mongodb".to_string(), true);
-         return Err(());
+         return Err(Error::MongoDBParserError);
       },
    };
 
@@ -18,7 +21,7 @@ pub async fn database() -> Result<Database, ()> {
       Ok(client) => client,
       Err(err) => {
          plog(err.kind.to_string(), "mongodb".to_string(), true);
-         return Err(());
+         return Err(Error::MongoDBNoClient);
       },
    };
 

@@ -10,7 +10,7 @@ use crate::{
    utils::{
       extractor::Json,
       jwt::new_token,
-      mongodb::database,
+      mongo::database,
       password_stuff::{hash_password, verify_password},
    },
 };

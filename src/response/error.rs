@@ -12,11 +12,19 @@ pub enum Error {
    EmailAlreadyTaken,
    UsernameAlreadyTaken,
    PasswordStuff,
+   PasswordHashError,
+   PasswordVerificationError,
    TokenStuff,
+   TokenNotVerified,
+   TokenNotCreated,
+   TokenNotFound,
    MongoDBStuff,
+   MongoDBParserError,
+   MongoDBNoClient,
    InvalidUsername,
    InvalidPassword,
    InvalidEmail,
+   NumberOverflow,
 }
 
 impl IntoResponse for Error {
