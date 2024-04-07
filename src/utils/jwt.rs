@@ -10,7 +10,7 @@ pub struct Claims {
    pub exp: usize,
 }
 
-pub fn create_token(username: String) -> Result<String, ()> {
+pub fn new_token(username: String) -> Result<String, ()> {
    let expiration_time = Utc::now()
       + match TimeDelta::try_days(30 * 6) {
          Some(time_delta) => time_delta,

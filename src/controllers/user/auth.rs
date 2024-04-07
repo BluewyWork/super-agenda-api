@@ -9,7 +9,7 @@ use crate::{
    response::{error::Error, success::Success, Result},
    utils::{
       extractor::Json,
-      jwt::create_token,
+      jwt::new_token,
       mongodb::database,
       password_stuff::{hash_password, verify_password},
    },
@@ -50,7 +50,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
       return Err(Error::PasswordStuff);
    }
 
-   let token = match create_token(user.username) {
+   let token = match new_token(user.username) {
       Ok(token) => token,
       Err(_) => return Err(Error::TokenStuff),
    };
