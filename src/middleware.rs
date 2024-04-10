@@ -1,5 +1,6 @@
 use axum::{
    extract::Request,
+   http::StatusCode,
    middleware::Next,
    response::{IntoResponse, Response},
 };
@@ -8,24 +9,33 @@ use serde_json::{json, to_value};
 use crate::response::{error::Error, success::Success};
 use crate::utils::{extractor::Json, jwt::verify_token};
 
-pub async fn authenticate_guest(request: Request, next: Next) -> Response {
-   let token = match request.headers().get("Authorization") {
-      Some(token_wrapped) => match token_wrapped.to_str() {
-         Ok(token) => token.to_string(),
-         Err(_) => return Error::TokenNotFound.into_response(),
+pub async fn authenticate_guest(mut request: Request, next: Next) -> Response {
+   let mut placeholder = StatusCode::FORBIDDEN.into_response();
+
+   let wrapped_token = request
+      .headers()
+      .get("Authorization")
+      .map(|header| header.to_str());
+
+   match wrapped_token {
+      Some(Ok(token)) => match verify_token(token.to_string()) {
+         Ok(claims) => {
+            request.extensions_mut().insert(claims);
+            return next.run(request).await;
+         },
+         Err(err) => {
+            placeholder.extensions_mut().insert(err);
+         },
       },
-      None => return Error::TokenNotFound.into_response(),
-   };
+      Some(Err(_)) => {
+         placeholder.extensions_mut().insert(Error::TokenNotFound);
+      },
+      None => {
+         placeholder.extensions_mut().insert(Error::TokenNotFound);
+      },
+   }
 
-   let jwt_payload = match verify_token(token) {
-      Ok(claims) => claims,
-      Err(err) => return err.into_response(),
-   };
-
-   let mut request = request;
-   request.extensions_mut().insert(jwt_payload);
-
-   next.run(request).await
+   placeholder
 }
 
 pub async fn map_response_from_error(response: Response) -> Response {
