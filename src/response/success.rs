@@ -9,6 +9,7 @@ use serde_json::Value;
 pub enum Success {
    Login(Value),
    Register,
+   Me(Value),
 }
 
 impl IntoResponse for Success {
@@ -24,11 +25,13 @@ impl IntoResponse for Success {
 impl Success {
    pub fn client_status_and_success(&self) -> (StatusCode, ClientSuccess) {
       match self {
+         Self::Register => (StatusCode::OK, ClientSuccess::REGISTERED),
+         Self::Me(json) => (StatusCode::OK, ClientSuccess::SHOW_PROFILE(json.clone())),
+
          Self::Login(token) => (
             StatusCode::CREATED,
             ClientSuccess::LOGGED_IN(token.to_owned()),
          ),
-         Self::Register => (StatusCode::OK, ClientSuccess::REGISTERED),
       }
    }
 }
@@ -40,4 +43,5 @@ impl Success {
 pub enum ClientSuccess {
    REGISTERED,
    LOGGED_IN(Value),
+   SHOW_PROFILE(Value),
 }

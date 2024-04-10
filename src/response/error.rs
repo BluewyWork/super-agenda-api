@@ -26,6 +26,7 @@ pub enum Error {
    NumberOverflow,
    ClaimsNotFound,
    JsonExtractionFail,
+   JsonSerializationFail,
 }
 
 impl IntoResponse for Error {
@@ -81,6 +82,7 @@ impl Error {
          | Error::MongoDBFail
          | Self::PasswordVerificationFail
          | Self::PasswordHashingFail
+         | Self::JsonSerializationFail
          | Error::NumberOverflow => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
       }
    }

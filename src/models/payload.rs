@@ -1,4 +1,4 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::schemas::{Phone, User};
 use crate::response::error::Error;
@@ -31,4 +31,13 @@ impl RegisterPayload {
          self.phone,
       )
    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserPayload {
+   pub username: String,
+   pub display_name: String,
+   pub email: Option<String>,
+   pub recovery_email: Option<String>,
+   pub phone: Option<Phone>,
 }
