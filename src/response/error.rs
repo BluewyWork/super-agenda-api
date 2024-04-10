@@ -25,6 +25,7 @@ pub enum Error {
    InvalidEmail,
    NumberOverflow,
    ClaimsNotFound,
+   JsonExtractionFail,
 }
 
 impl IntoResponse for Error {
@@ -44,6 +45,7 @@ impl Error {
          Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::INVALID_EMAIL),
          Self::TokenNotFound => (StatusCode::BAD_REQUEST, ClientError::MISSING_TOKEN),
          Self::TokenInvalid => (StatusCode::FORBIDDEN, ClientError::INVALID_TOKEN),
+         Self::JsonExtractionFail => (StatusCode::BAD_REQUEST, ClientError::INVALID_JSON),
 
          Self::ClaimsNotFound => (
             StatusCode::UNAUTHORIZED,
@@ -95,6 +97,7 @@ pub enum ClientError {
    INVALID_USERNAME,
    INVALID_EMAIL,
    INVALID_PASSWORD,
+   INVALID_JSON,
    AUTHORIZATION_REQUIRED,
    SERVER_ERROR,
 }

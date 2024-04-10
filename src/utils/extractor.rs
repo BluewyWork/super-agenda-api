@@ -1,13 +1,16 @@
 use axum::{
-   extract::{rejection::JsonRejection, FromRequest},
-   http::StatusCode,
-   response::{IntoResponse, Response},
+   async_trait,
+   extract::{rejection::JsonRejection, FromRequest, FromRequestParts},
+   http::request::Parts,
+   response::IntoResponse,
 };
 use serde::Serialize;
-use serde_json::{json, Value};
+
+use crate::response::error::Error;
+use super::jwt::Claims;
 
 #[derive(FromRequest)]
-#[from_request(via(axum::Json), rejection(Answer))]
+#[from_request(via(axum::Json), rejection(Error))]
 pub struct Json<T>(pub T);
 
 impl<T: Serialize> IntoResponse for Json<T> {
@@ -17,63 +20,21 @@ impl<T: Serialize> IntoResponse for Json<T> {
    }
 }
 
-impl From<JsonRejection> for Answer {
-   fn from(rejection: JsonRejection) -> Self {
-      Self::from_status_message(rejection.status(), rejection.body_text().into())
+impl From<JsonRejection> for Error {
+   fn from(_rejection: JsonRejection) -> Self {
+      Self::JsonExtractionFail
    }
 }
 
-pub struct Answer {
-   pub status: StatusCode,
-   pub message: String,
-   pub data: Value,
-}
+#[async_trait]
+impl<S: Send + Sync> FromRequestParts<S> for Claims {
+   type Rejection = Error;
 
-#[allow(dead_code)]
-impl Answer {
-   pub fn new() -> Answer {
-      Answer {
-         status: StatusCode::OK,
-         message: String::from(""),
-         data: json!({}),
-      }
-   }
-
-   pub fn from_status(status: StatusCode) -> Answer {
-      Answer {
-         status,
-         message: String::from(""),
-         data: json!({}),
-      }
-   }
-
-   pub fn from_status_message(status: StatusCode, message: String) -> Answer {
-      Answer {
-         status,
-         message,
-         data: json!({}),
-      }
-   }
-
-   pub fn from_status_message_data(status: StatusCode, message: String, data: Value) -> Answer {
-      Answer {
-         status,
-         message,
-         data,
-      }
-   }
-}
-
-impl IntoResponse for Answer {
-   fn into_response(self) -> Response {
-      let ok = self.status < StatusCode::from_u16(400).unwrap();
-
-      let json = Json(json!({
-         "ok": ok,
-         "message": self.message,
-         "data": self.data,
-      }));
-
-      (self.status, json).into_response()
+   async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
+      parts
+         .extensions
+         .get::<Claims>()
+         .cloned()
+         .ok_or(Error::ClaimsNotFound)
    }
 }
