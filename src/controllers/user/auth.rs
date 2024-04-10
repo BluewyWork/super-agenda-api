@@ -75,7 +75,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
 
    let user = payload.to_user(hashed_password)?;
 
-   if let Err(_) = users_collection.insert_one(user, None).await {
+   if (users_collection.insert_one(user, None).await).is_err() {
       return Err(Error::MongoDBInsertFail);
    }
 
