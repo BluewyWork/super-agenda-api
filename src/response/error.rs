@@ -2,10 +2,7 @@ use axum::{
    http::StatusCode,
    response::{IntoResponse, Response},
 };
-use mongodb::Client;
 use serde::Serialize;
-
-use crate::models::schemas::Status;
 
 #[derive(Clone, Debug, Serialize, strum_macros::AsRefStr)]
 pub enum Error {
@@ -27,6 +24,7 @@ pub enum Error {
    InvalidPassword,
    InvalidEmail,
    NumberOverflow,
+   ClaimsNotFound,
 }
 
 impl IntoResponse for Error {
@@ -44,8 +42,13 @@ impl Error {
       match self {
          Self::MongoDBDuplicateEmail => (StatusCode::CONFLICT, ClientError::UNAVAILABLE_EMAIL),
          Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::INVALID_EMAIL),
-         Error::TokenNotFound => (StatusCode::BAD_REQUEST, ClientError::MISSING_TOKEN),
-         Error::TokenInvalid => (StatusCode::FORBIDDEN, ClientError::INVALID_TOKEN),
+         Self::TokenNotFound => (StatusCode::BAD_REQUEST, ClientError::MISSING_TOKEN),
+         Self::TokenInvalid => (StatusCode::FORBIDDEN, ClientError::INVALID_TOKEN),
+
+         Self::ClaimsNotFound => (
+            StatusCode::UNAUTHORIZED,
+            ClientError::AUTHORIZATION_REQUIRED,
+         ),
 
          Self::PayloadUsernameOrEmailNotFound => {
             (StatusCode::BAD_REQUEST, ClientError::INVALID_CREDENTIALS)
@@ -92,5 +95,6 @@ pub enum ClientError {
    INVALID_USERNAME,
    INVALID_EMAIL,
    INVALID_PASSWORD,
+   AUTHORIZATION_REQUIRED,
    SERVER_ERROR,
 }

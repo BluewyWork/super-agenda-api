@@ -33,6 +33,7 @@ impl Success {
    }
 }
 
+#[allow(warnings)]
 #[allow(non_camel_case_types)]
 #[derive(Debug, Serialize, strum_macros::AsRefStr)]
 #[serde(tag = "message", content = "data")]

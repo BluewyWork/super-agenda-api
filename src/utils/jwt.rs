@@ -41,7 +41,7 @@ pub fn new_token(username: String) -> Result<String, Error> {
       Ok(token) => Ok(token),
       Err(err) => {
          plog(format!("{:?}", err.kind()), "jwt".to_string(), true);
-         Err(Error::TokenCreationError)
+         Err(Error::TokenCreationFail)
       },
    }
 }
