@@ -1,17 +1,15 @@
-use axum::{extract::Request, response::Response};
 use mongodb::bson::doc;
-use serde_json::{json, Value};
+use serde_json::json;
 
 use crate::{
    models::{payload::UserPayload, schemas::User},
-   response::{self, error::Error, success::Success},
+   response::{self, error::Error, success::Success, Result},
    utils::{
-      jwt::Claims,
-      mongo::{self, database},
+      extractor::Json, jwt::Claims, mongo::database
    },
 };
 
-pub async fn me(claims: Claims) -> response::Result {
+pub async fn me(claims: Claims) -> Result {
    let mongodb = database().await?;
 
    let users_collection = mongodb.collection::<User>("users");
@@ -38,4 +36,9 @@ pub async fn me(claims: Claims) -> response::Result {
       Ok(None) => Err(Error::MongoDBUserNotFound),
       Err(_) => Err(Error::MongoDBFail),
    }
+}
+
+pub async fn update(claims: Claims, Json(user_payload): Json<UserPayload>) -> Result {
+
+   todo!()
 }
