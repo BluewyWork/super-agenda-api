@@ -6,8 +6,10 @@ use axum::{
 };
 use serde_json::{json, to_value};
 
-use crate::response::{error::Error, success::Success};
-use crate::utils::{extractor::Json, jwt::verify_token};
+use crate::{
+   response::{error::Error, success::Success},
+   utils::{extractor::Json, jwt::verify_token},
+};
 
 pub async fn authenticate_guest(mut request: Request, next: Next) -> Response {
    let mut placeholder = StatusCode::FORBIDDEN.into_response();

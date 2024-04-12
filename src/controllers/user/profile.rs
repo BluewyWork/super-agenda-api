@@ -28,7 +28,9 @@ pub async fn show(claims: Claims) -> Result {
          let serialized_user_payload =
             serde_json::to_value(user_payload).map_err(|_| Error::JsonSerializationFail)?;
 
-         Ok(Success::ShowUserProfileResult(json!({"user": serialized_user_payload})))
+         Ok(Success::ShowUserProfileResult(
+            json!({"user": serialized_user_payload}),
+         ))
       },
       Ok(None) => Err(Error::MongoDBUserNotFound),
       Err(_) => Err(Error::MongoDBFail),
@@ -59,8 +61,11 @@ pub async fn update(claims: Claims, Json(user_payload): Json<UserPayload>) -> Re
       }
    };
 
-   match users_collection.update_one(doc!{"username": username}, update_query, None).await {
-      Ok(_) => {Ok(Success::UpdateUserProfileResult)},
-      Err(_) => {Err(Error::UpdateUserProfileFail)}
+   match users_collection
+      .update_one(doc! {"username": username}, update_query, None)
+      .await
+   {
+      Ok(_) => Ok(Success::UpdateUserProfileResult),
+      Err(_) => Err(Error::UpdateUserProfileFail),
    }
 }

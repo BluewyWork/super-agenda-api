@@ -6,8 +6,8 @@ use axum::{
 };
 use serde::Serialize;
 
-use crate::response::error::Error;
 use super::jwt::Claims;
+use crate::response::error::Error;
 
 #[derive(FromRequest)]
 #[from_request(via(axum::Json), rejection(Error))]

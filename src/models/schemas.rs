@@ -1,4 +1,4 @@
-use mongodb::bson::{Bson, DateTime, Document};
+use mongodb::bson::{Bson, Document};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -57,12 +57,11 @@ pub struct Phone {
    pub number: i64,
 }
 
-
 impl From<Phone> for Bson {
-    fn from(phone: Phone) -> Self {
-        let mut doc = Document::new();
-        doc.insert("country_code", phone.country_code);
-        doc.insert("number", phone.number);
-        Bson::Document(doc)
-    }
+   fn from(phone: Phone) -> Self {
+      let mut doc = Document::new();
+      doc.insert("country_code", phone.country_code);
+      doc.insert("number", phone.number);
+      Bson::Document(doc)
+   }
 }

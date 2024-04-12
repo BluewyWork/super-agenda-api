@@ -2,8 +2,7 @@ use axum::{middleware::map_response, Router};
 use tokio::net::TcpListener;
 
 use crate::{
-   middleware::map_response_from_error,
-   middleware::map_response_from_success,
+   middleware::{map_response_from_error, map_response_from_success},
    utils::{constants::SERVER_ADDRESS, log::plog},
 };
 

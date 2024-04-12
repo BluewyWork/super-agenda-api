@@ -37,8 +37,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
       Err(_) => return Err(Error::MongoDBFail),
    };
 
-   let password_matched =
-      matches(payload.password.to_string(), &user.hashed_password)?;
+   let password_matched = matches(payload.password.to_string(), &user.hashed_password)?;
 
    if !password_matched {
       return Err(Error::PasswordIsWrong);

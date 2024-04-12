@@ -4,10 +4,7 @@ use axum::{
    Router,
 };
 
-use crate::{
-   controllers,
-   middleware::authenticate_guest,
-};
+use crate::{controllers, middleware::authenticate_guest};
 
 pub fn user_routes() -> Router {
    let user_auth_route = Router::new()
