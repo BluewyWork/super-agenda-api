@@ -17,10 +17,9 @@ use crate::{
 
 pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
    let mongodb = database().await?;
-
    let users_collection = mongodb.collection::<User>("users");
 
-   let find_one_user = if let Some(email) = payload.email {
+   let find_user = if let Some(email) = payload.email {
       users_collection
          .find_one(doc! { "email": email }, None)
          .await
@@ -32,7 +31,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
       return Err(Error::PayloadUsernameOrEmailNotFound);
    };
 
-   let user = match find_one_user {
+   let user = match find_user {
       Ok(Some(user)) => user,
       Ok(None) => return Err(Error::MongoDBUserNotFound),
       Err(_) => return Err(Error::MongoDBFail),
@@ -47,15 +46,14 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
 
    let token = new_token(user.username)?;
 
-   Ok(Success::Login(json!({"token": token})))
+   Ok(Success::LoginResult(json!({"token": token})))
 }
 
 pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    let mongodb = database().await?;
-
    let users_collection = mongodb.collection::<User>("users");
 
-   // Check for duplicate username.
+   // Duplicate usernames are not allowed.
    if let Ok(Some(_)) = users_collection
       .find_one(doc! {"username": &payload.username}, None)
       .await
@@ -63,7 +61,7 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
       return Err(Error::MongoDBDuplicateUsername);
    }
 
-   // Check for duplicate email.
+   // Duplicate emails are not allowed.
    if let Ok(Some(_)) = users_collection
       .find_one(doc! {"email": &payload.email}, None)
       .await
@@ -72,12 +70,11 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    }
 
    let hashed_password = hash_password(payload.password.to_string())?;
-
    let user = payload.to_user(hashed_password)?;
 
    if (users_collection.insert_one(user, None).await).is_err() {
       return Err(Error::MongoDBInsertFail);
    }
 
-   Ok(Success::Register)
+   Ok(Success::RegisterResult)
 }

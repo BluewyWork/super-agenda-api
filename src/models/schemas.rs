@@ -1,4 +1,4 @@
-use mongodb::bson::DateTime;
+use mongodb::bson::{Bson, DateTime, Document};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -51,47 +51,18 @@ impl User {
    }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct Phone {
-   pub country_code: u16,
-   pub number: u32,
+   pub country_code: i32,
+   pub number: i64,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Task {
-   pub object_id: String,
-   pub title: Option<String>,
-   pub description: Option<String>,
-   pub status: Status,
-   pub priority: Priority,
-   pub tags: Option<Vec<String>>,
-   pub planning: Option<Planning>,
-   pub metrics: Option<Metrics>,
-}
 
-#[derive(Debug, Deserialize, Serialize)]
-pub enum Status {
-   NotStarted,
-   Ongoing,
-   Completed,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub enum Priority {
-   High,
-   Normal,
-   Low,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Planning {
-   initiation: Option<DateTime>,
-   deadline: Option<DateTime>,
-   estimated_duration_in_minutes: Option<u32>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Metrics {
-   date_time_when_status_is_started: Option<DateTime>,
-   date_time_when_status_is_completed: Option<DateTime>,
+impl From<Phone> for Bson {
+    fn from(phone: Phone) -> Self {
+        let mut doc = Document::new();
+        doc.insert("country_code", phone.country_code);
+        doc.insert("number", phone.number);
+        Bson::Document(doc)
+    }
 }

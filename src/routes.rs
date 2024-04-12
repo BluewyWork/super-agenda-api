@@ -15,7 +15,8 @@ pub fn user_routes() -> Router {
       .route("/register", post(controllers::user::auth::register));
 
    let user_profile_route = Router::new()
-      .route("/me", get(controllers::user::profile::me))
+      .route("/me", get(controllers::user::profile::show))
+      .route("/update", post(controllers::user::profile::update))
       .layer(from_fn(authenticate_guest));
 
    Router::new()

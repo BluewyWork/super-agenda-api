@@ -27,6 +27,7 @@ pub enum Error {
    ClaimsNotFound,
    JsonExtractionFail,
    JsonSerializationFail,
+   UpdateUserProfileFail,
 }
 
 impl IntoResponse for Error {
@@ -75,15 +76,16 @@ impl Error {
             (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS)
          },
 
-         Error::TokenCreationFail
-         | Error::MongoDBParserFail
-         | Error::MongoDBNoClient
-         | Error::MongoDBInsertFail
-         | Error::MongoDBFail
+         Self::TokenCreationFail
+         | Self::MongoDBParserFail
+         | Self::MongoDBNoClient
+         | Self::MongoDBInsertFail
+         | Self::MongoDBFail
          | Self::PasswordVerificationFail
          | Self::PasswordHashingFail
          | Self::JsonSerializationFail
-         | Error::NumberOverflow => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
+         | Self::UpdateUserProfileFail
+         | Self::NumberOverflow => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
       }
    }
 }
