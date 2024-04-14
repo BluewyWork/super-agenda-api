@@ -9,7 +9,7 @@ pub fn hash_password(password: String) -> Result<String, Error> {
          "security".to_string(),
          true,
       );
-      Error::PasswordHashingFail
+      Error::PasswordHashing
    })
 }
 
@@ -20,6 +20,6 @@ pub fn matches(password: String, hash: &str) -> Result<bool, Error> {
          "security".to_string(),
          true,
       );
-      Error::PasswordVerificationFail
+      Error::PasswordVerification
    })
 }

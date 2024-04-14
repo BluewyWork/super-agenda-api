@@ -7,8 +7,8 @@ use serde_json::Value;
 
 #[derive(Clone)]
 pub enum Success {
-   AuthLogin(Value),
-   AuthRegister,
+   TokenCreation(Value),
+   UserCreation,
    UserShow(Value),
    UserUpdation,
    UserDeletion,
@@ -27,15 +27,15 @@ impl IntoResponse for Success {
 impl Success {
    pub fn client_status_and_success(&self) -> (StatusCode, ClientSuccess) {
       match self {
-         Self::AuthRegister => (StatusCode::OK, ClientSuccess::REGISTERED),
+         Self::UserCreation => (StatusCode::OK, ClientSuccess::USER_CREATED),
          Self::UserUpdation => (StatusCode::OK, ClientSuccess::USER_UPDATED),
          Self::UserDeletion => (StatusCode::OK, ClientSuccess::USER_DELETED),
 
          Self::UserShow(json) => (StatusCode::OK, ClientSuccess::USER_SHOWED(json.clone())),
 
-         Self::AuthLogin(token) => (
+         Self::TokenCreation(token) => (
             StatusCode::CREATED,
-            ClientSuccess::LOGGED_IN(token.to_owned()),
+            ClientSuccess::TOKEN_CREATED(token.to_owned()),
          ),
       }
    }
@@ -46,8 +46,8 @@ impl Success {
 #[derive(Debug, Serialize, strum_macros::AsRefStr)]
 #[serde(tag = "message", content = "data")]
 pub enum ClientSuccess {
-   REGISTERED,
-   LOGGED_IN(Value),
+   TOKEN_CREATED(Value),
+   USER_CREATED,
    USER_SHOWED(Value),
    USER_UPDATED,
    USER_DELETED,

@@ -45,7 +45,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
 
    let token = new_token(user.username)?;
 
-   Ok(Success::AuthLogin(json!({"token": token})))
+   Ok(Success::TokenCreation(json!({"token": token})))
 }
 
 pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
@@ -72,8 +72,8 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
    let user = payload.to_user(hashed_password)?;
 
    if (users_collection.insert_one(user, None).await).is_err() {
-      return Err(Error::MongoDBInsertFail);
+      return Err(Error::MongoDBInsert);
    }
 
-   Ok(Success::AuthRegister)
+   Ok(Success::UserCreation)
 }

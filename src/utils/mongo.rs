@@ -13,7 +13,7 @@ pub async fn database() -> Result<Database, Error> {
       Ok(opt) => opt,
       Err(err) => {
          plog(err.kind.to_string(), "mongodb".to_string(), true);
-         return Err(Error::MongoDBParserFail);
+         return Err(Error::MongoDBParser);
       },
    };
 

@@ -22,7 +22,7 @@ impl<T: Serialize> IntoResponse for Json<T> {
 
 impl From<JsonRejection> for Error {
    fn from(_rejection: JsonRejection) -> Self {
-      Self::JsonExtractionFail
+      Self::JsonExtraction
    }
 }
 

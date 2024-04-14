@@ -8,27 +8,27 @@ use serde::Serialize;
 pub enum Error {
    PayloadUsernameOrEmailNotFound,
    PasswordIsWrong,
-   PasswordHashingFail,
-   PasswordVerificationFail,
+   PasswordHashing,
+   PasswordVerification,
    TokenNotFound,
    TokenInvalid,
-   TokenCreationFail,
+   TokenCreation,
    MongoDBDuplicateEmail,
    MongoDBDuplicateUsername,
    MongoDBUserNotFound,
-   MongoDBParserFail,
+   MongoDBParser,
    MongoDBNoClient,
-   MongoDBInsertFail,
+   MongoDBInsert,
    MongoDBFail,
    InvalidUsername,
    InvalidPassword,
    InvalidEmail,
    NumberOverflow,
    ClaimsNotFound,
-   JsonExtractionFail,
-   JsonSerializationFail,
-   UserUpdationFail,
-   UserDeletionFail,
+   JsonExtraction,
+   JsonSerialization,
+   UserUpdation,
+   UserDeletion,
 }
 
 impl IntoResponse for Error {
@@ -48,7 +48,7 @@ impl Error {
          Self::InvalidEmail => (StatusCode::UNPROCESSABLE_ENTITY, ClientError::INVALID_EMAIL),
          Self::TokenNotFound => (StatusCode::BAD_REQUEST, ClientError::MISSING_TOKEN),
          Self::TokenInvalid => (StatusCode::FORBIDDEN, ClientError::INVALID_TOKEN),
-         Self::JsonExtractionFail => (StatusCode::BAD_REQUEST, ClientError::INVALID_JSON),
+         Self::JsonExtraction => (StatusCode::BAD_REQUEST, ClientError::INVALID_JSON),
 
          Self::ClaimsNotFound => (
             StatusCode::UNAUTHORIZED,
@@ -77,16 +77,16 @@ impl Error {
             (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS)
          },
 
-         Self::TokenCreationFail
-         | Self::MongoDBParserFail
+         Self::TokenCreation
+         | Self::MongoDBParser
          | Self::MongoDBNoClient
-         | Self::MongoDBInsertFail
+         | Self::MongoDBInsert
          | Self::MongoDBFail
-         | Self::PasswordVerificationFail
-         | Self::PasswordHashingFail
-         | Self::JsonSerializationFail
-         | Self::UserUpdationFail
-         | Self::UserDeletionFail
+         | Self::PasswordVerification
+         | Self::PasswordHashing
+         | Self::JsonSerialization
+         | Self::UserUpdation
+         | Self::UserDeletion
          | Self::NumberOverflow => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
       }
    }

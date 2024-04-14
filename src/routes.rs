@@ -1,6 +1,6 @@
 use axum::{
    middleware::from_fn,
-   routing::{get, post},
+   routing::{delete, get, post},
    Router,
 };
 
@@ -14,7 +14,7 @@ pub fn user_routes() -> Router {
    let user_profile_route = Router::new()
       .route("/show", get(controllers::user::profile::show))
       .route("/update", post(controllers::user::profile::update))
-      .route("/delete", get(controllers::user::profile::delete))
+      .route("/delete", delete(controllers::user::profile::delete))
       .layer(from_fn(authenticate_guest));
 
    Router::new()

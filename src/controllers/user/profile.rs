@@ -26,7 +26,7 @@ pub async fn show(claims: Claims) -> Result {
          };
 
          let serialized_user_payload =
-            serde_json::to_value(user_payload).map_err(|_| Error::JsonSerializationFail)?;
+            serde_json::to_value(user_payload).map_err(|_| Error::JsonSerialization)?;
 
          Ok(Success::UserShow(
             json!({"user": serialized_user_payload}),
@@ -66,7 +66,7 @@ pub async fn update(claims: Claims, Json(user_payload): Json<UserPayload>) -> Re
       .await
       .is_err()
    {
-      return Err(Error::UserUpdationFail);
+      return Err(Error::UserUpdation);
    }
 
    Ok(Success::UserUpdation)
@@ -91,7 +91,7 @@ pub async fn delete(claims: Claims) -> Result {
       .await
       .is_err()
    {
-      return Err(Error::UserDeletionFail);
+      return Err(Error::UserDeletion);
    }
 
    Ok(Success::UserDeletion)
