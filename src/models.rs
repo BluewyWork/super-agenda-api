@@ -1,2 +1,2 @@
-pub mod payload;
+pub mod payloads;
 pub mod schemas;

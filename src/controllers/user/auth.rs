@@ -3,7 +3,7 @@ use serde_json::json;
 
 use crate::{
    models::{
-      payload::{LoginPayload, RegisterPayload},
+      payloads::{LoginPayload, RegisterPayload},
       schemas::User,
    },
    response::{error::Error, success::Success, Result},

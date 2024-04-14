@@ -2,7 +2,7 @@ use mongodb::bson::doc;
 use serde_json::json;
 
 use crate::{
-   models::{payload::UserPayload, schemas::User},
+   models::{payloads::UserPayload, schemas::User},
    response::{error::Error, success::Success, Result},
    utils::{extractor::Json, jwt::Claims, mongo::database},
 };
@@ -28,9 +28,7 @@ pub async fn show(claims: Claims) -> Result {
          let serialized_user_payload =
             serde_json::to_value(user_payload).map_err(|_| Error::JsonSerialization)?;
 
-         Ok(Success::UserShow(
-            json!({"user": serialized_user_payload}),
-         ))
+         Ok(Success::UserShow(json!({"user": serialized_user_payload})))
       },
       Ok(None) => Err(Error::MongoDBUserNotFound),
       Err(_) => Err(Error::MongoDBFail),
