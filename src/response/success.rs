@@ -7,10 +7,11 @@ use serde_json::Value;
 
 #[derive(Clone)]
 pub enum Success {
-   LoginResult(Value),
-   RegisterResult,
-   ShowUserProfileResult(Value),
-   UpdateUserProfileResult,
+   AuthLogin(Value),
+   AuthRegister,
+   UserShow(Value),
+   UserUpdation,
+   UserDeletion,
 }
 
 impl IntoResponse for Success {
@@ -26,14 +27,13 @@ impl IntoResponse for Success {
 impl Success {
    pub fn client_status_and_success(&self) -> (StatusCode, ClientSuccess) {
       match self {
-         Self::RegisterResult => (StatusCode::OK, ClientSuccess::REGISTERED),
-         Self::UpdateUserProfileResult => (StatusCode::OK, ClientSuccess::PROFILE_UPDATED),
+         Self::AuthRegister => (StatusCode::OK, ClientSuccess::REGISTERED),
+         Self::UserUpdation => (StatusCode::OK, ClientSuccess::USER_UPDATED),
+         Self::UserDeletion => (StatusCode::OK, ClientSuccess::USER_DELETED),
 
-         Self::ShowUserProfileResult(json) => {
-            (StatusCode::OK, ClientSuccess::PROFILE_SHOWED(json.clone()))
-         },
+         Self::UserShow(json) => (StatusCode::OK, ClientSuccess::USER_SHOWED(json.clone())),
 
-         Self::LoginResult(token) => (
+         Self::AuthLogin(token) => (
             StatusCode::CREATED,
             ClientSuccess::LOGGED_IN(token.to_owned()),
          ),
@@ -48,6 +48,7 @@ impl Success {
 pub enum ClientSuccess {
    REGISTERED,
    LOGGED_IN(Value),
-   PROFILE_SHOWED(Value),
-   PROFILE_UPDATED,
+   USER_SHOWED(Value),
+   USER_UPDATED,
+   USER_DELETED,
 }

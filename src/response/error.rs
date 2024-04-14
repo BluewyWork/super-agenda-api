@@ -27,7 +27,8 @@ pub enum Error {
    ClaimsNotFound,
    JsonExtractionFail,
    JsonSerializationFail,
-   UpdateUserProfileFail,
+   UserUpdationFail,
+   UserDeletionFail,
 }
 
 impl IntoResponse for Error {
@@ -84,7 +85,8 @@ impl Error {
          | Self::PasswordVerificationFail
          | Self::PasswordHashingFail
          | Self::JsonSerializationFail
-         | Self::UpdateUserProfileFail
+         | Self::UserUpdationFail
+         | Self::UserDeletionFail
          | Self::NumberOverflow => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::SERVER_ERROR),
       }
    }

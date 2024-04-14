@@ -28,7 +28,7 @@ pub async fn show(claims: Claims) -> Result {
          let serialized_user_payload =
             serde_json::to_value(user_payload).map_err(|_| Error::JsonSerializationFail)?;
 
-         Ok(Success::ShowUserProfileResult(
+         Ok(Success::UserShow(
             json!({"user": serialized_user_payload}),
          ))
       },
@@ -61,11 +61,38 @@ pub async fn update(claims: Claims, Json(user_payload): Json<UserPayload>) -> Re
       }
    };
 
-   match users_collection
+   if users_collection
       .update_one(doc! {"username": username}, update_query, None)
       .await
+      .is_err()
    {
-      Ok(_) => Ok(Success::UpdateUserProfileResult),
-      Err(_) => Err(Error::UpdateUserProfileFail),
+      return Err(Error::UserUpdationFail);
    }
+
+   Ok(Success::UserUpdation)
+}
+
+pub async fn delete(claims: Claims) -> Result {
+   let mongodb = database().await?;
+   let users_collection = mongodb.collection::<User>("users");
+
+   let find_user = users_collection
+      .find_one(doc! {"username": claims.username}, None)
+      .await;
+
+   let username = match find_user {
+      Ok(Some(user)) => user.username,
+      Ok(None) => return Err(Error::MongoDBUserNotFound),
+      Err(_) => return Err(Error::MongoDBFail),
+   };
+
+   if users_collection
+      .delete_one(doc! {"username": username}, None)
+      .await
+      .is_err()
+   {
+      return Err(Error::UserDeletionFail);
+   }
+
+   Ok(Success::UserDeletion)
 }

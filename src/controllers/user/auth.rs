@@ -45,7 +45,7 @@ pub async fn login(Json(payload): Json<LoginPayload>) -> Result {
 
    let token = new_token(user.username)?;
 
-   Ok(Success::LoginResult(json!({"token": token})))
+   Ok(Success::AuthLogin(json!({"token": token})))
 }
 
 pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
@@ -75,5 +75,5 @@ pub async fn register(Json(payload): Json<RegisterPayload>) -> Result {
       return Err(Error::MongoDBInsertFail);
    }
 
-   Ok(Success::RegisterResult)
+   Ok(Success::AuthRegister)
 }
