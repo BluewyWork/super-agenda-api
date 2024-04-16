@@ -1,22 +1,6 @@
-[package]
-name = "super-agenda-api"
-version = "0.1.0"
-edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-axum = { version = "0.7.4", features = ["macros"] }
-dotenvy = "0.15.7"
-serde = { version = "1.0.197", features = ["derive"] }
-serde_json = "1.0.114"
-tokio = { version = "1.36.0", features = ["full"] }
-mongodb = "2.8.1"
-bcrypt = "0.15"
-jsonwebtoken = "9.2"
-dotenvy_macro = "0.15.7"
-lazy_static = "1.4.0"
-tower-http = { version = "0.5.2", features = ["cors"] }
-chrono = "0.4.35"
-regex = "1.10.4"
-strum_macros = "0.26.2"
+[workspace]
+resolver = "2"
+members = [ "crates/libs/lib-database", 
+   "crates/libs/lib-utils",
+   "crates/services/web-server", "crates/services/web-test",
+]
