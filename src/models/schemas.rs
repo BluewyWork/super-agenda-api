@@ -1,4 +1,4 @@
-use mongodb::bson::{Bson, Document};
+use mongodb::bson::{oid::ObjectId, serde_helpers::serialize_bson_datetime_as_rfc3339_string, Bson, DateTime, Document};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 
@@ -64,4 +64,42 @@ impl From<Phone> for Bson {
       doc.insert("number", phone.number);
       Bson::Document(doc)
    }
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct TaskGroup {
+   id: ObjectId,
+   owner: ObjectId,
+   list: Vec<Task>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Task {
+   id: ObjectId,
+   title: Option<String>,
+   description: Option<String>,
+   status: Option<TaskStatus>,
+   priority: Option<TaskPriority>,
+   schedule: Option<TaskSchedule>,
+}
+
+#[derive(Deserialize, Serialize)]
+pub enum TaskStatus {
+   NotStarted,
+   OnGoing,
+   Completed,
+}
+
+#[derive(Deserialize, Serialize)]
+pub enum TaskPriority {
+   Low,
+   Normal,
+   High,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct TaskSchedule {
+   start: Option<DateTime>,
+   end: Option<DateTime>,
+   estimated_duration_minutes: Option<u64>,
 }
