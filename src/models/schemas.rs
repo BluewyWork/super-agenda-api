@@ -6,6 +6,7 @@ use crate::response::error::Error;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
+   pub id: ObjectId,
    pub username: String,
    pub display_name: String,
    pub hashed_password: String,
@@ -41,6 +42,7 @@ impl User {
       }
 
       Ok(User {
+         id: ObjectId::new(),
          username,
          display_name,
          hashed_password: password,
@@ -68,19 +70,19 @@ impl From<Phone> for Bson {
 
 #[derive(Deserialize, Serialize)]
 pub struct TaskGroup {
-   id: ObjectId,
-   owner: ObjectId,
-   list: Vec<Task>,
+   pub id: ObjectId,
+   pub owner: ObjectId,
+   pub list: Vec<Task>,
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct Task {
-   id: ObjectId,
-   title: Option<String>,
-   description: Option<String>,
-   status: Option<TaskStatus>,
-   priority: Option<TaskPriority>,
-   schedule: Option<TaskSchedule>,
+   pub id: ObjectId,
+   pub title: Option<String>,
+   pub description: Option<String>,
+   pub status: Option<TaskStatus>,
+   pub priority: Option<TaskPriority>,
+   pub schedule: Option<TaskSchedule>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -99,7 +101,7 @@ pub enum TaskPriority {
 
 #[derive(Deserialize, Serialize)]
 pub struct TaskSchedule {
-   start: Option<DateTime>,
-   end: Option<DateTime>,
-   estimated_duration_minutes: Option<u64>,
+   pub start: Option<DateTime>,
+   pub end: Option<DateTime>,
+   pub estimated_duration_minutes: Option<u64>,
 }
