@@ -3,7 +3,7 @@ use tokio::net::TcpListener;
 
 use crate::{
    middleware::{map_response_from_error, map_response_from_success},
-   utils::{constants::SERVER_ADDRESS, log::plog},
+   utils::constants::SERVER_ADDRESS,
 };
 
 mod controllers;
@@ -15,13 +15,7 @@ mod utils;
 
 #[tokio::main]
 async fn main() {
-   let listener = match TcpListener::bind(SERVER_ADDRESS.to_string()).await {
-      Ok(listener) => listener,
-      Err(err) => {
-         plog(format!("{}", err), "main".to_string(), true);
-         return;
-      },
-   };
+   let listener = TcpListener::bind(SERVER_ADDRESS.to_string()).await.unwrap();
 
    println!("Server running on {}", *SERVER_ADDRESS);
 
@@ -30,7 +24,5 @@ async fn main() {
       .layer(map_response(map_response_from_error))
       .layer(map_response(map_response_from_success));
 
-   if let Err(err) = axum::serve(listener, app).await {
-      plog(format!("{}", err), "main".to_string(), true);
-   };
+   axum::serve(listener, app).await.unwrap();
 }

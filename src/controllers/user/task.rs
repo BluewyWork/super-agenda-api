@@ -45,12 +45,14 @@ pub async fn create(claims: Claims) -> Result {
             list: Vec::new(),
          };
 
+         let id = task_group.id;
+
          match tasks_collection.insert_one(task_group, None).await {
             Ok(_) => {},
             Err(_) => return Err(Error::MongoDBInsert),
          };
 
-         task_group.id
+         id
       },
       Err(_) => return Err(Error::MongoDBFail),
    };
@@ -68,7 +70,7 @@ pub async fn create(claims: Claims) -> Result {
       "$push": { "list": task}
    };
 
-   tasks_collection.update_one(doc! {"_id": task_group_id}, update_query, None);
+   let _ = tasks_collection.update_one(doc! {"_id": task_group_id}, update_query, None).await;
 
    Ok(Success::UserCreation)
 }
