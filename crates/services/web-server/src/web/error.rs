@@ -14,8 +14,8 @@ pub enum Error {
    PasswordTooShort,
    PasswordDoesNotMatch,
    TokenDaysOverflow,
-
-   EnumVariantToBeDeleted,
+   TokenNotFound,
+   ClaimsNotFound,
 
    LibDatabase(lib_database::error::Error),
    Bcrypt(String),
@@ -36,7 +36,9 @@ impl Error {
       match self {
          Self::JsonExtraction => (StatusCode::BAD_REQUEST, ClientError::UNEXPECTED_BODY),
          Self::PasswordDoesNotMatch => (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS),
-         Self::TokenDaysOverflow => (StatusCode::INTERNAL_SERVER_ERROR, ClientError::INTERNAL_SERVER_ERROR),
+         Self::ClaimsNotFound | Self::TokenNotFound => {
+            (StatusCode::BAD_REQUEST, ClientError::INVALID_CREDENTIALS)
+         },
 
          Self::UsernameTooShort => (
             StatusCode::UNPROCESSABLE_ENTITY,
@@ -47,24 +49,12 @@ impl Error {
             ClientError::PASSWORD_TOO_SHORT,
          ),
 
-         Self::Bcrypt(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            ClientError::ENUM_VARIANT_TO_BE_DELETED,
-         ),
-
-         Self::LibDatabase(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            ClientError::ENUM_VARIANT_TO_BE_DELETED,
-         ),
-
-         Self::JsonWebToken(_) => (
+         Self::TokenDaysOverflow
+         | Self::Bcrypt(_)
+         | Self::LibDatabase(_)
+         | Self::JsonWebToken(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             ClientError::INTERNAL_SERVER_ERROR,
-         ),
-
-         Self::EnumVariantToBeDeleted => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            ClientError::ENUM_VARIANT_TO_BE_DELETED,
          ),
       }
    }
@@ -77,20 +67,19 @@ pub enum ClientError {
    PASSWORD_TOO_SHORT,
    INVALID_CREDENTIALS,
    UNEXPECTED_BODY,
-   ENUM_VARIANT_TO_BE_DELETED,
    INTERNAL_SERVER_ERROR,
 }
 
 impl Display for Error {
    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
       let message = match self {
+         Self::JsonExtraction => String::from("json signature does not match"),
          Self::PasswordTooShort => String::from("password too short. 5 characters min."),
          Self::UsernameTooShort => String::from("username too short. 5 characters min"),
          Self::PasswordDoesNotMatch => String::from("password does not match"),
          Self::TokenDaysOverflow => String::from("unable to create token due to size overflow"),
-
-         Self::JsonExtraction => String::from("json signature does not match"),
-         Self::EnumVariantToBeDeleted => String::from("enum variant to be deleted"),
+         Self::TokenNotFound => String::from("no token found"),
+         Self::ClaimsNotFound => String::from("claims not found"),
 
          Self::Bcrypt(string) => string.to_string(),
          Self::LibDatabase(err) => err.to_string(),

@@ -1,17 +1,18 @@
 use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use lib_utils::constants::JWT_SECRET;
+use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 
 use crate::web::error::{Error, Result};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Claims {
-   pub username: String,
    pub exp: usize,
+   pub user_id: ObjectId,
 }
 
-pub fn create_token(username: String) -> Result<String> {
+pub fn create_token(user_id: ObjectId) -> Result<String> {
    let expiration_time = Utc::now()
       + match TimeDelta::try_days(30 * 6) {
          Some(time_delta) => time_delta,
@@ -22,7 +23,7 @@ pub fn create_token(username: String) -> Result<String> {
    let exp_unix_timestamp = expiration_time.timestamp() as usize;
 
    let claims = Claims {
-      username,
+      user_id,
       exp: exp_unix_timestamp,
    };
 

@@ -1979,6 +1979,7 @@ dependencies = [
  "jsonwebtoken",
  "lib-database",
  "lib-utils",
+ "mongodb",
  "regex",
  "serde",
  "serde_json",

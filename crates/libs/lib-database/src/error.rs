@@ -6,25 +6,39 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
    UnableToCreateUser,
    UnableToFindUser,
-   MongoDB(mongodb::error::Error)
+   UnableToFindTaskGroup,
+   UnableToFindTask,
+
+   MongoDB(mongodb::error::Error),
+   MongoDBBson(mongodb::bson::ser::Error),
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-       let message = match self {
-          Self::UnableToCreateUser => String::from("unable to create user"),
-          Self::UnableToFindUser => String::from("unable to find user"),
-          Self::MongoDB(err) => err.to_string()
-       };
+   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+      let message = match self {
+         Self::UnableToCreateUser => String::from("unable to create user"),
+         Self::UnableToFindUser => String::from("unable to find user"),
+         Self::UnableToFindTaskGroup => String::from("unable to find task group"),
+         Self::UnableToFindTask => String::from("unable to find task"),
 
-       write!(f, "ERROR => {message}")
-    }
+         Self::MongoDB(err) => err.to_string(),
+         Self::MongoDBBson(err) => err.to_string(),
+      };
+
+      write!(f, "ERROR => {message}")
+   }
 }
 
 impl std::error::Error for Error {}
 
 impl From<mongodb::error::Error> for Error {
-    fn from(err: mongodb::error::Error) -> Self {
-       Self::MongoDB(err)
-    }
+   fn from(err: mongodb::error::Error) -> Self {
+      Self::MongoDB(err)
+   }
+}
+
+impl From<mongodb::bson::ser::Error> for Error {
+   fn from(err: mongodb::bson::ser::Error) -> Self {
+      Self::MongoDBBson(err)
+   }
 }
