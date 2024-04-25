@@ -25,6 +25,6 @@ impl DatabaseManager {
    }
 
    pub fn users_data_collection(&self) -> Collection<UserData> {
-      self.database.collection::<UserData>("users-task-lists")
+      self.database.collection::<UserData>("users-data")
    }
 }

@@ -9,7 +9,7 @@ use crate::{
    models::database::DatabaseManager,
 };
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserData {
    _id: ObjectId,
    owner: ObjectId,
@@ -64,7 +64,7 @@ impl UserDataTable {
 
       let update = doc! {
          "$push": doc! {
-            "list": to_bson(&task).unwrap()
+            "task_list": to_bson(&task).unwrap()
          }
       };
 
@@ -83,6 +83,8 @@ impl UserDataTable {
          Some(user_data) => user_data,
          None => return Err(Error::UnableToFindUserData),
       };
+
+      println!("{:?}", user_data);
 
       Ok(user_data.task_list)
    }
