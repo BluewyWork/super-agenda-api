@@ -6,7 +6,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
    UnableToCreateUser,
    UnableToFindUser,
-   UnableToFindTaskGroup,
+   UnableToFindUserData,
    UnableToFindTask,
 
    MongoDB(mongodb::error::Error),
@@ -18,7 +18,7 @@ impl Display for Error {
       let message = match self {
          Self::UnableToCreateUser => String::from("unable to create user"),
          Self::UnableToFindUser => String::from("unable to find user"),
-         Self::UnableToFindTaskGroup => String::from("unable to find task group"),
+         Self::UnableToFindUserData => String::from("unable to find task group"),
          Self::UnableToFindTask => String::from("unable to find task"),
 
          Self::MongoDB(err) => err.to_string(),

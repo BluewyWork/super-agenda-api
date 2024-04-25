@@ -79,12 +79,12 @@ impl UserDataTable {
    pub async fn get_task_list(&self, user_id: ObjectId) -> Result<Vec<Task>> {
       let filter = doc! { "owner": user_id };
 
-      let task_group = match self.user_data_collection.find_one(filter, None).await? {
-         Some(task_group) => task_group,
-         None => return Err(Error::UnableToFindTaskGroup),
+      let user_data = match self.user_data_collection.find_one(filter, None).await? {
+         Some(user_data) => user_data,
+         None => return Err(Error::UnableToFindUserData),
       };
 
-      Ok(task_group.task_list)
+      Ok(user_data.task_list)
    }
 
    pub async fn update_task(&self, user_id: ObjectId, task: Task) -> Result<()> {
