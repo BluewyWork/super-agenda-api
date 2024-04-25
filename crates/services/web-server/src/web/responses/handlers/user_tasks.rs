@@ -15,7 +15,7 @@ use crate::web::{
 pub async fn create(
    State(user_data_table): State<UserDataTable>,
    claims: Claims,
-   task: Task,
+   Json(task): Json<Task>,
 ) -> Result<ApiResponse> {
    user_data_table.create_task(claims.user_id, task).await?;
 
@@ -39,7 +39,7 @@ pub async fn show(
    })
 }
 
-pub async fn update_task(
+pub async fn update(
    State(user_data_table): State<UserDataTable>,
    claims: Claims,
    Json(payload): Json<Task>,
@@ -53,7 +53,7 @@ pub async fn update_task(
    })
 }
 
-pub async fn update_task_list(
+pub async fn update_list(
    State(user_data_table): State<UserDataTable>,
    claims: Claims,
    Json(payload): Json<Vec<Task>>,
@@ -69,7 +69,7 @@ pub async fn update_task_list(
    })
 }
 
-pub async fn delete_task(
+pub async fn delete(
    State(user_data_table): State<UserDataTable>,
    claims: Claims,
    Path(task_id): Path<ObjectId>,

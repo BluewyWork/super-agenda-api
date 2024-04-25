@@ -1,6 +1,6 @@
 use axum::{
    middleware::from_fn,
-   routing::{delete, get, post},
+   routing::{delete, get, patch, post},
    Router,
 };
 use lib_database::models::tables::{user::UserTable, user_data::UserDataTable};
@@ -26,8 +26,11 @@ pub fn user_routes(user_table: UserTable, task_groups_table: UserDataTable) -> R
       .with_state(user_table);
 
    let user_task_routes = Router::new()
+      .route("/create", post(user_tasks::create))
       .route("/show", get(user_tasks::show))
-      // .route("/update", post(user_tasks::update))
+      .route("/update", post(user_tasks::update))
+      .route("/update/list", post(user_tasks::update_list))
+      .route("/delete", patch(user_tasks::delete))
       .layer(from_fn(authenticate_guest))
       .with_state(task_groups_table);
 
