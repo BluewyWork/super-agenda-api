@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 tokio = { version = "1.37.0", features = ["full"] }
+mongodb = "2.8.2"
 
 lib-database = { path = "../../libs/lib-database"}
 lib-utils = { path = "../../libs/lib-utils"}
