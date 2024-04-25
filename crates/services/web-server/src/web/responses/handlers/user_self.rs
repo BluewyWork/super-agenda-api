@@ -20,7 +20,7 @@ pub async fn show(State(user_table): State<UserTable>, claims: Claims) -> Result
    Ok(ApiResponse {
       status_code: StatusCode::OK,
       message: None,
-      data: Some(json!({"user": user_show_payload})),
+      data: Some(json!(user_show_payload)),
    })
 }
 

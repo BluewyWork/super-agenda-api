@@ -26,7 +26,7 @@ pub async fn create(
    })
 }
 
-pub async fn show(
+pub async fn show_list(
    State(user_data_table): State<UserDataTable>,
    claims: Claims,
 ) -> Result<ApiResponse> {

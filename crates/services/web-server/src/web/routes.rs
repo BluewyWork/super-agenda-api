@@ -27,7 +27,7 @@ pub fn user_routes(user_table: UserTable, task_groups_table: UserDataTable) -> R
 
    let user_task_routes = Router::new()
       .route("/create", post(user_tasks::create))
-      .route("/show", get(user_tasks::show))
+      .route("/show", get(user_tasks::show_list))
       .route("/update", post(user_tasks::update))
       .route("/update/list", post(user_tasks::update_list))
       .route("/delete", patch(user_tasks::delete))

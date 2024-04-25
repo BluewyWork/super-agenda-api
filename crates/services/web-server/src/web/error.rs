@@ -54,7 +54,7 @@ impl Error {
          | Self::LibDatabase(_)
          | Self::JsonWebToken(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            ClientError::INTERNAL_SERVER_ERROR,
+            ClientError::SERVICE_ERROR,
          ),
       }
    }
@@ -67,7 +67,7 @@ pub enum ClientError {
    PASSWORD_TOO_SHORT,
    INVALID_CREDENTIALS,
    UNEXPECTED_BODY,
-   INTERNAL_SERVER_ERROR,
+   SERVICE_ERROR,
 }
 
 impl Display for Error {
