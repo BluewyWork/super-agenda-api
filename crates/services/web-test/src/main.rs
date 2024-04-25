@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use lib_database::models::{database::DatabaseManager, tables::{user::UserTable, user_data::UserDataTable}};
+use lib_database::models::{database::DatabaseManager, tables::{user::UserTable, user_data::{self, Task, TaskStatus, UserDataTable}}};
 use lib_utils::constants::{MONGO_DB, MONGO_URI};
 use mongodb::bson::oid::ObjectId;
 
@@ -16,7 +16,20 @@ async fn main() {
 
    let user_data_table = UserDataTable::from(database_manager);
 
+   user_data_table.create_task(ObjectId::from_str("6622b619c23a20b74fee6c57").unwrap(), Task {
+      _id: ObjectId::new(),
+      title: String::from("Random Title"),
+      description: String::from("This is a random description."),
+      status: TaskStatus::NotStarted
+   }).await.unwrap();
+
    let task_list = user_data_table.get_task_list(ObjectId::from_str("6622b619c23a20b74fee6c57").unwrap()).await.unwrap();
 
    println!("{:?}", task_list);
+
+   for task in &task_list {
+      println!("{}, {:?}", task.title, task);
+   }
+
+   println!("{}", task_list.len());
 }
