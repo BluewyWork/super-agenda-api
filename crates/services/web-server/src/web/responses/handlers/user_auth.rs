@@ -1,16 +1,19 @@
 use axum::{extract::State, http::StatusCode};
-use lib_database::models::tables::user::{User, UserTable};
+use lib_database::models::tables::user::User;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::web::{
-   custom::{extractors::Json, response::ApiResponse},
-   error::{Error, Result},
-   utils::{
-      password::{hash_password, matches},
-      token::create_token,
+use crate::{
+   web::{
+      custom::{extractors::Json, response::ApiResponse},
+      error::{Error, Result},
+      utils::{
+         password::{hash_password, matches},
+         token::create_token,
+      },
    },
+   ApiState,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -20,7 +23,7 @@ pub struct RegisterPayload {
 }
 
 pub async fn register(
-   State(user_table): State<UserTable>,
+   State(api_state): State<ApiState>,
    Json(register_payload): Json<RegisterPayload>,
 ) -> Result<ApiResponse> {
    let RegisterPayload {
@@ -44,7 +47,7 @@ pub async fn register(
       hashed_password,
    };
 
-   user_table.create_user(user).await?;
+   api_state.user_table.create_user(user).await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,
@@ -60,7 +63,7 @@ pub struct LoginPayload {
 }
 
 pub async fn login(
-   State(user_table): State<UserTable>,
+   State(api_state): State<ApiState>,
    Json(login_payload): Json<LoginPayload>,
 ) -> Result<ApiResponse> {
    let LoginPayload {
@@ -68,7 +71,10 @@ pub async fn login(
       password: password_clear,
    } = login_payload;
 
-   let user = user_table.find_user_from_username(&username).await?;
+   let user = api_state
+      .user_table
+      .find_user_from_username(&username)
+      .await?;
 
    let is_same = matches(password_clear, &user.hashed_password)?;
 

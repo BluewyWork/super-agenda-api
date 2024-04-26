@@ -2,22 +2,28 @@ use axum::{
    extract::{Path, State},
    http::StatusCode,
 };
-use lib_database::models::tables::user_data::{Task, UserDataTable};
+use lib_database::models::tables::user_data::{Task};
 use mongodb::bson::oid::ObjectId;
 use serde_json::json;
 
-use crate::web::{
-   custom::{extractors::Json, response::ApiResponse},
-   error::Result,
-   utils::token::Claims,
+use crate::{
+   web::{
+      custom::{extractors::Json, response::ApiResponse},
+      error::Result,
+      utils::token::Claims,
+   },
+   ApiState,
 };
 
 pub async fn create(
-   State(user_data_table): State<UserDataTable>,
+   State(api_state): State<ApiState>,
    claims: Claims,
    Json(task): Json<Task>,
 ) -> Result<ApiResponse> {
-   user_data_table.create_task(claims.user_id, task).await?;
+   api_state
+      .user_data_table
+      .create_task(claims.user_id, task)
+      .await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::CREATED,
@@ -26,11 +32,11 @@ pub async fn create(
    })
 }
 
-pub async fn show_list(
-   State(user_data_table): State<UserDataTable>,
-   claims: Claims,
-) -> Result<ApiResponse> {
-   let task_list = user_data_table.get_task_list(claims.user_id).await?;
+pub async fn show_list(State(api_state): State<ApiState>, claims: Claims) -> Result<ApiResponse> {
+   let task_list = api_state
+      .user_data_table
+      .get_task_list(claims.user_id)
+      .await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,
@@ -40,11 +46,14 @@ pub async fn show_list(
 }
 
 pub async fn update(
-   State(user_data_table): State<UserDataTable>,
+   State(api_state): State<ApiState>,
    claims: Claims,
    Json(payload): Json<Task>,
 ) -> Result<ApiResponse> {
-   user_data_table.update_task(claims.user_id, payload).await?;
+   api_state
+      .user_data_table
+      .update_task(claims.user_id, payload)
+      .await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,
@@ -54,11 +63,12 @@ pub async fn update(
 }
 
 pub async fn update_list(
-   State(user_data_table): State<UserDataTable>,
+   State(api_state): State<ApiState>,
    claims: Claims,
    Json(payload): Json<Vec<Task>>,
 ) -> Result<ApiResponse> {
-   user_data_table
+   api_state
+      .user_data_table
       .update_task_list(claims.user_id, payload)
       .await?;
 
@@ -70,11 +80,14 @@ pub async fn update_list(
 }
 
 pub async fn delete(
-   State(user_data_table): State<UserDataTable>,
+   State(api_state): State<ApiState>,
    claims: Claims,
    Path(task_id): Path<ObjectId>,
 ) -> Result<ApiResponse> {
-   user_data_table.delete_task(claims.user_id, task_id).await?;
+   api_state
+      .user_data_table
+      .delete_task(claims.user_id, task_id)
+      .await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,

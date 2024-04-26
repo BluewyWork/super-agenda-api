@@ -19,7 +19,7 @@ pub mod web {
    pub mod routes;
 }
 
-use axum::{middleware::map_response, Router};
+use axum::{extract::FromRef, middleware::map_response, Router};
 use lib_database::models::{
    database::DatabaseManager,
    tables::{user::UserTable, user_data::UserDataTable},
@@ -34,13 +34,17 @@ async fn main() -> Result<()> {
    let database_manager = DatabaseManager::from(&MONGO_URI, &MONGO_DB).await.unwrap();
 
    let user_table = UserTable::from(database_manager.clone());
-   let task_groups_table = UserDataTable::from(database_manager);
+   let user_data_table = UserDataTable::from(database_manager);
+
+   let app_state = AppState {
+      api_state: ApiState {
+         user_table,
+         user_data_table,
+      },
+   };
 
    let app = Router::new()
-      .nest(
-         "/api/user",
-         routes::user_routes(user_table, task_groups_table),
-      )
+      .nest("/api/user", routes::user_routes(app_state))
       .layer(map_response(map_response_from_error));
 
    let listener = TcpListener::bind(SERVER_ADDRESS.to_string()).await.unwrap();
@@ -50,4 +54,21 @@ async fn main() -> Result<()> {
    axum::serve(listener, app).await.unwrap();
 
    Ok(())
+}
+
+#[derive(Clone)]
+pub struct AppState {
+   api_state: ApiState,
+}
+
+#[derive(Clone)]
+pub struct ApiState {
+   user_table: UserTable,
+   user_data_table: UserDataTable,
+}
+
+impl FromRef<AppState> for ApiState {
+   fn from_ref(app_state: &AppState) -> ApiState {
+      app_state.api_state.clone()
+   }
 }
