@@ -95,8 +95,6 @@ impl UserDataTable {
          None => return Err(Error::UnableToFindUserData),
       };
 
-      println!("{:?}", user_data);
-
       Ok(user_data.task_list)
    }
 
