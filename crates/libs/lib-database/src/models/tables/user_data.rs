@@ -43,6 +43,17 @@ impl UserDataTable {
       }
    }
 
+   // UserData related stuff.
+
+   pub async fn delete(&self, user_id: ObjectId) -> Result<()> {
+      let filter = doc! { "owner": user_id };
+      self.user_data_collection.delete_one(filter, None).await?;
+
+      Ok(())
+   }
+
+   // Task related stuff.
+
    pub async fn create_task(&self, user_id: ObjectId, task: Task) -> Result<()> {
       if (self
          .user_data_collection
