@@ -833,6 +833,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "lib-database-v2"
+version = "0.1.0"
+dependencies = [
+ "lib-utils",
+ "mongodb",
+ "serde",
+]
+
+[[package]]
 name = "lib-utils"
 version = "0.1.0"
 dependencies = [
