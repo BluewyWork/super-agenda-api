@@ -36,6 +36,7 @@ pub async fn update() -> Result<ApiResponse> {
 
 pub async fn nuke(State(api_state): State<ApiState>, claims: Claims) -> Result<ApiResponse> {
    api_state.user_table.delete_user(claims.user_id).await?;
+   api_state.user_data_table.delete(claims.user_id).await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,
