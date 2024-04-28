@@ -26,7 +26,7 @@ pub async fn map_response_from_error(response: Response) -> Response {
       });
 
    let client_error = client_status_error.unzip().1;
-   println! {"ERROR => SERVICE: {:?} - CLIENT: {:?}", service_error, client_error}
+   println! {"ERROR => SERVICE: {:?} |---| CLIENT: {:?}", service_error, client_error}
 
    error_reponse.unwrap_or(response)
 }
