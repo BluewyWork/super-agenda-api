@@ -1,5 +1,5 @@
 use mongodb::{
-   bson::{doc, oid::ObjectId, to_bson},
+   bson::{doc, oid::ObjectId, to_bson, DateTime},
    Collection,
 };
 use serde::{Deserialize, Serialize};
@@ -22,6 +22,8 @@ pub struct Task {
    pub title: String,
    pub description: String,
    pub status: TaskStatus,
+   pub start_date_time: DateTime,
+   pub end_date_time: DateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
