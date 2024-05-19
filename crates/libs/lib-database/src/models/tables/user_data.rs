@@ -22,8 +22,8 @@ pub struct Task {
    pub title: String,
    pub description: String,
    pub status: TaskStatus,
-   pub start_date_time: DateTime,
-   pub end_date_time: DateTime,
+   pub start_date_time: Option<DateTime>,
+   pub end_date_time: Option<DateTime>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

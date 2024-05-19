@@ -4,17 +4,13 @@ use lib_database::models::{
    database::DatabaseManager,
    tables::{
       user::UserTable,
-      user_data::{self, Task, TaskStatus, UserDataTable},
+      user_data::{Task, TaskStatus, UserDataTable},
    },
 };
 use lib_utils::constants::{MONGO_DB, MONGO_URI};
 use mongodb::{
    bson::{oid::ObjectId, DateTime},
-   options::ClientOptions,
-   results::InsertOneResult,
-   Client,
 };
-use serde::{Deserialize, Serialize};
 
 #[tokio::main]
 async fn main() {
@@ -39,8 +35,8 @@ async fn main() {
             title: String::from("New Title"),
             description: String::from("This is a new description."),
             status: TaskStatus::NotStarted,
-            end_date_time: DateTime::now(),
-            start_date_time: DateTime::now(),
+            end_date_time: Some(DateTime::now()),
+            start_date_time: Some(DateTime::now()),
          },
       )
       .await
