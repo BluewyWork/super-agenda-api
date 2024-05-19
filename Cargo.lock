@@ -2003,6 +2003,8 @@ dependencies = [
  "lib-database",
  "lib-utils",
  "mongodb",
+ "serde",
+ "serde_json",
  "tokio",
 ]
 
