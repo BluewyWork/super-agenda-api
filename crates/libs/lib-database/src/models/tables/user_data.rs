@@ -104,6 +104,17 @@ impl UserDataTable {
       let filter = doc! {"owner": user_id, "task_list._id": task._id };
       let update = doc! {"$set": doc! { "task_list.$": to_bson(&task)? } };
 
+      let result = self.user_data_collection.find_one(filter.clone(), None).await;
+
+      match result {
+         Ok(_) => {},
+         Err(_) => {
+            // Quick fix for importing tasks (on the android side) that might need to be created
+            // because this is the first solution I thought of.
+            self.create_task(user_id, task).await?;
+         }
+      }
+
       self
          .user_data_collection
          .update_one(filter, update, None)
