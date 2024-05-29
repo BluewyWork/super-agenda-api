@@ -48,8 +48,8 @@ async fn main() -> Result<()> {
    };
 
    let app = Router::new()
-      .nest("/api/user", routes::user_routes(app_state.clone()))
-      .nest("/api/admin", routes::admin_routes(app_state))
+      .nest("/api/user", routes::user_routes(&app_state))
+      .nest("/api/admin", routes::admin_routes(&app_state))
       .layer(map_response(map_response_from_error));
 
    let listener = TcpListener::bind(SERVER_ADDRESS.to_string()).await.unwrap();

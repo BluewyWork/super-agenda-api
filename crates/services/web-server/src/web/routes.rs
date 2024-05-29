@@ -10,7 +10,7 @@ use super::responses::{
 };
 use crate::AppState;
 
-pub fn user_routes(app_state: AppState) -> Router {
+pub fn user_routes(app_state: &AppState) -> Router {
    let user_auth_routes = Router::new()
       .route("/register", post(user_auth::register))
       .route("/login", post(user_auth::login))
@@ -29,7 +29,7 @@ pub fn user_routes(app_state: AppState) -> Router {
       .route("/update/list", post(user_tasks::update_list))
       .route("/delete", patch(user_tasks::delete))
       .layer(from_fn(authenticate_user_or_admin))
-      .with_state(app_state);
+      .with_state(app_state.clone());
 
    Router::new()
       .nest("/auth", user_auth_routes)
@@ -37,7 +37,7 @@ pub fn user_routes(app_state: AppState) -> Router {
       .nest("/task", user_task_routes)
 }
 
-pub fn admin_routes(app_state: AppState) -> Router {
+pub fn admin_routes(app_state: &AppState) -> Router {
    let admin_auth_routes = Router::new()
       .route("/login", post(admin_auth::login))
       .with_state(app_state.clone());
@@ -45,7 +45,7 @@ pub fn admin_routes(app_state: AppState) -> Router {
    let admin_stuff_routes = Router::new()
       .route("/show/all", get(admin_stuff::show_user_list))
       .layer(from_fn(authenticate_user_or_admin))
-      .with_state(app_state);
+      .with_state(app_state.clone());
 
    Router::new()
       .nest("/auth", admin_auth_routes)
