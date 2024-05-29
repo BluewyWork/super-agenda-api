@@ -1,20 +1,24 @@
-use mongodb::bson::doc;
-use mongodb::{bson::oid::ObjectId, Collection};
+use mongodb::{
+   bson::{doc, oid::ObjectId},
+   Collection,
+};
 use serde::{Deserialize, Serialize};
 
-use crate::models::database::DatabaseManager;
-use crate::error::{Error, Result};
+use crate::{
+   error::{Error, Result},
+   models::database::DatabaseManager,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct Admin {
    pub _id: ObjectId,
    pub username: String,
-   pub hashed_password: String
+   pub hashed_password: String,
 }
 
 #[derive(Clone)]
 pub struct AdminTable {
-   admin_collection: Collection<Admin>
+   admin_collection: Collection<Admin>,
 }
 
 impl AdminTable {

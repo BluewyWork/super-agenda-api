@@ -1,11 +1,10 @@
 use mongodb::{options::ClientOptions, Client, Collection, Database};
 
+use super::tables::admin::Admin;
 use crate::{
    error::Result,
    models::tables::{user::User, user_data::UserData},
 };
-
-use super::tables::admin::Admin;
 
 #[derive(Clone)]
 pub struct DatabaseManager {

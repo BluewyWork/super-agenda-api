@@ -1,12 +1,15 @@
-use axum::extract::State;
-use axum::http::StatusCode;
+use axum::{extract::State, http::StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::web::custom::response::ApiResponse;
-use crate::web::error::{Error, Result};
-use crate::web::utils::{password::matches, token::create_token};
-use crate::{web::custom::extractors::Json, ApiState};
+use crate::{
+   web::{
+      custom::{extractors::Json, response::ApiResponse},
+      error::{Error, Result},
+      utils::{password::matches, token::create_token},
+   },
+   ApiState,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct LoginPayload {

@@ -4,7 +4,7 @@ use mongodb::{options::ClientOptions, Client, Collection, Database};
 use crate::models::error::Result;
 
 pub struct ModelManager {
-   database: Database
+   database: Database,
 }
 
 impl ModelManager {

@@ -35,7 +35,7 @@ impl UserTable {
 
       let user = match collection.find_one(filter, None).await? {
          Some(user) => user,
-         None => {return Err(Error::UserNotFound)}
+         None => return Err(Error::UserNotFound),
       };
 
       Ok(user)

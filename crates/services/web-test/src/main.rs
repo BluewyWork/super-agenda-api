@@ -3,13 +3,13 @@ use std::str::FromStr;
 use lib_database::models::{
    database::DatabaseManager,
    tables::{
-      admin::AdminTable, user::UserTable, user_data::{Task, TaskStatus, UserDataTable}
+      admin::AdminTable,
+      user::UserTable,
+      user_data::{Task, TaskStatus, UserDataTable},
    },
 };
 use lib_utils::constants::{MONGO_DB, MONGO_URI};
-use mongodb::{
-   bson::{oid::ObjectId, DateTime},
-};
+use mongodb::bson::{oid::ObjectId, DateTime};
 
 #[tokio::main]
 async fn main() {
@@ -17,10 +17,14 @@ async fn main() {
 
    let admin_table = AdminTable::from(database_manager);
 
-   admin_table.create_admin(
-      lib_database::models::tables::admin::Admin { _id: ObjectId::new(), username: String::from("admin"), hashed_password: hash_password("admin") }
-   ).await.unwrap();
-
+   admin_table
+      .create_admin(lib_database::models::tables::admin::Admin {
+         _id: ObjectId::new(),
+         username: String::from("admin"),
+         hashed_password: hash_password("admin"),
+      })
+      .await
+      .unwrap();
 
    let admin = admin_table.find_admin_from_username("admin").await.unwrap();
 
@@ -65,7 +69,6 @@ async fn main() {
    //
    // println!("{}", task_list.len());
 }
-
 
 pub fn hash_password(password: &str) -> String {
    bcrypt::hash(password, 10).unwrap()
