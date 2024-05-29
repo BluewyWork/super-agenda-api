@@ -37,7 +37,7 @@ pub async fn login(
       return Err(Error::PasswordDoesNotMatch);
    }
 
-   let token = create_token(admin._id)?;
+   let token = create_token(admin.id)?;
 
    Ok(ApiResponse {
       status_code: StatusCode::CREATED,

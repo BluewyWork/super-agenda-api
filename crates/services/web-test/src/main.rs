@@ -3,7 +3,7 @@ use std::str::FromStr;
 use lib_database::models::{
    database::DatabaseManager,
    tables::{
-      admin::AdminTable,
+      admin::{Admin, AdminTable},
       user::UserTable,
       user_data::{Task, TaskStatus, UserDataTable},
    },
@@ -18,8 +18,8 @@ async fn main() {
    let admin_table = AdminTable::from(database_manager);
 
    admin_table
-      .create_admin(lib_database::models::tables::admin::Admin {
-         _id: ObjectId::new(),
+      .create_admin(Admin {
+         id: ObjectId::new(),
          username: String::from("admin"),
          hashed_password: hash_password("admin"),
       })

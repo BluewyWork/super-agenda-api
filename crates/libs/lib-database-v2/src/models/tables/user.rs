@@ -8,7 +8,8 @@ use crate::models::{
 
 #[derive(Serialize, Deserialize)]
 pub struct User {
-   _id: ObjectId,
+   #[serde(rename = "_id")]
+   id: ObjectId,
    username: String,
    hashed_password: String,
 }

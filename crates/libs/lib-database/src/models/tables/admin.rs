@@ -11,7 +11,8 @@ use crate::{
 
 #[derive(Serialize, Deserialize)]
 pub struct Admin {
-   pub _id: ObjectId,
+   #[serde(rename = "id")]
+   pub id: ObjectId,
    pub username: String,
    pub hashed_password: String,
 }

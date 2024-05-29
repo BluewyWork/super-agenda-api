@@ -11,14 +11,16 @@ use crate::{
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserData {
-   _id: ObjectId,
+   #[serde(rename = "_id")]
+   id: ObjectId,
    owner: ObjectId,
    task_list: Vec<Task>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
-   pub _id: ObjectId,
+   #[serde(rename = "_id")]
+   pub id: ObjectId,
    pub title: String,
    pub description: String,
    pub status: TaskStatus,
@@ -64,7 +66,7 @@ impl UserDataTable {
          .is_none()
       {
          let user_data = UserData {
-            _id: ObjectId::new(),
+            id: ObjectId::new(),
             owner: user_id,
             task_list: Vec::new(),
          };
@@ -101,7 +103,7 @@ impl UserDataTable {
    }
 
    pub async fn update_task(&self, user_id: ObjectId, task: Task) -> Result<()> {
-      let filter = doc! {"owner": user_id, "task_list._id": task._id };
+      let filter = doc! {"owner": user_id, "task_list._id": task.id };
       let update = doc! {"$set": doc! { "task_list.$": to_bson(&task)? } };
 
       let result = self
