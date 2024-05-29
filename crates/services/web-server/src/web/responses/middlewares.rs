@@ -31,7 +31,7 @@ pub async fn map_response_from_error(response: Response) -> Response {
    error_reponse.unwrap_or(response)
 }
 
-pub async fn authenticate_guest(mut request: Request, next: Next) -> Response {
+pub async fn authenticate_user_or_admin(mut request: Request, next: Next) -> Response {
    let mut placeholder = StatusCode::FORBIDDEN.into_response();
 
    let wrapped_token = request

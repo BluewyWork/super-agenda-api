@@ -42,7 +42,7 @@ pub async fn register(
    let hashed_password = hash_password(&password_clear)?;
 
    let user = User {
-      _id: ObjectId::new(),
+      id: ObjectId::new(),
       username,
       hashed_password,
    };
@@ -82,7 +82,7 @@ pub async fn login(
       return Err(Error::PasswordDoesNotMatch);
    }
 
-   let token = create_token(user._id)?;
+   let token = create_token(user.id)?;
 
    Ok(ApiResponse {
       status_code: StatusCode::CREATED,

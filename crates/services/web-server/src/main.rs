@@ -5,6 +5,8 @@ pub mod web {
    }
    pub mod responses {
       pub mod handlers {
+         pub mod admin_auth;
+         pub mod admin_stuff;
          pub mod user_auth;
          pub mod user_self;
          pub mod user_tasks;
@@ -22,7 +24,7 @@ pub mod web {
 use axum::{extract::FromRef, middleware::map_response, Router};
 use lib_database::models::{
    database::DatabaseManager,
-   tables::{user::UserTable, user_data::UserDataTable},
+   tables::{admin::AdminTable, user::UserTable, user_data::UserDataTable},
 };
 use lib_utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use tokio::net::TcpListener;
@@ -33,18 +35,21 @@ use crate::web::{error::Result, responses::middlewares::map_response_from_error,
 async fn main() -> Result<()> {
    let database_manager = DatabaseManager::from(&MONGO_URI, &MONGO_DB).await.unwrap();
 
+   let admin_table = AdminTable::from(database_manager.clone());
    let user_table = UserTable::from(database_manager.clone());
    let user_data_table = UserDataTable::from(database_manager);
 
    let app_state = AppState {
       api_state: ApiState {
+         admin_table,
          user_table,
          user_data_table,
       },
    };
 
    let app = Router::new()
-      .nest("/api/user", routes::user_routes(app_state))
+      .nest("/api/user", routes::user_routes(app_state.clone()))
+      .nest("/api/admin", routes::admin_routes(app_state))
       .layer(map_response(map_response_from_error));
 
    let listener = TcpListener::bind(SERVER_ADDRESS.to_string()).await.unwrap();
@@ -63,6 +68,7 @@ pub struct AppState {
 
 #[derive(Clone)]
 pub struct ApiState {
+   admin_table: AdminTable,
    user_table: UserTable,
    user_data_table: UserDataTable,
 }

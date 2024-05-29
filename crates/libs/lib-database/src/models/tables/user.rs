@@ -1,3 +1,4 @@
+use futures::stream::TryStreamExt;
 use mongodb::{
    bson::{doc, oid::ObjectId},
    Collection,
@@ -11,7 +12,8 @@ use crate::{
 
 #[derive(Serialize, Deserialize)]
 pub struct User {
-   pub _id: ObjectId,
+   #[serde(rename = "_id")]
+   pub id: ObjectId,
    pub username: String,
    pub hashed_password: String,
 }
@@ -27,6 +29,18 @@ impl UserTable {
       UserTable {
          users_collection: database_manager.users_collection(),
       }
+   }
+
+   pub async fn find_all_users(&self) -> Result<Vec<User>> {
+      let mut maybe_user_list = self.users_collection.find(doc! {}, None).await?;
+
+      let mut user_list: Vec<User> = Vec::new();
+
+      while let Some(user) = maybe_user_list.try_next().await? {
+         user_list.push(user);
+      }
+
+      Ok(user_list)
    }
 
    pub async fn find_user_from_username(&self, username: &str) -> Result<User> {

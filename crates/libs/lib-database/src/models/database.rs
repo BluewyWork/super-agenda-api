@@ -5,6 +5,8 @@ use crate::{
    models::tables::{user::User, user_data::UserData},
 };
 
+use super::tables::admin::Admin;
+
 #[derive(Clone)]
 pub struct DatabaseManager {
    database: Database,
@@ -26,5 +28,9 @@ impl DatabaseManager {
 
    pub fn users_data_collection(&self) -> Collection<UserData> {
       self.database.collection::<UserData>("users-data")
+   }
+
+   pub fn admin_collection(&self) -> Collection<Admin> {
+      self.database.collection::<Admin>("admins")
    }
 }
