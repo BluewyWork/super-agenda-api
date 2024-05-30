@@ -23,7 +23,7 @@ pub mod web {
 
 use std::sync::Arc;
 
-use axum::{extract::FromRef, middleware::map_response, routing::post, Router};
+use axum::{middleware::map_response, Router};
 use lib_database::models::{
    database::DatabaseManager,
    tables::{admin::AdminTable, user::UserTable, user_data::UserDataTable},
@@ -31,7 +31,7 @@ use lib_database::models::{
 use lib_utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use tokio::net::TcpListener;
 
-use crate::web::{error::Result, responses::{handlers::user_auth, middlewares::map_response_from_error}, routes};
+use crate::web::{error::Result, responses::{middlewares::map_response_from_error}, routes};
 
 #[tokio::main]
 async fn main() -> Result<()> {
