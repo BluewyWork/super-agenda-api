@@ -10,7 +10,6 @@ use crate::{
 
 pub async fn show_user_list(
    State(app_state): State<Arc<AppState>>,
-   _claims: Claims,
 ) -> Result<ApiResponse> {
    let user_list = app_state.user_table.find_all_users().await?;
 

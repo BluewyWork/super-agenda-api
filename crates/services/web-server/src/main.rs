@@ -5,8 +5,9 @@ pub mod web {
    }
    pub mod responses {
       pub mod handlers {
+         pub mod admin_admin;
          pub mod admin_auth;
-         pub mod admin_stuff;
+         pub mod admin_user;
          pub mod user_auth;
          pub mod user_self;
          pub mod user_tasks;
