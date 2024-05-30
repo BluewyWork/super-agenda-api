@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{
    extract::{Path, State},
    http::StatusCode,
@@ -11,12 +13,11 @@ use crate::{
       custom::{extractors::Json, response::ApiResponse},
       error::Result,
       utils::token::Claims,
-   },
-   ApiState,
+   }, AppState,
 };
 
 pub async fn create(
-   State(api_state): State<ApiState>,
+   State(api_state): State<Arc<AppState>>,
    claims: Claims,
    Json(task): Json<Task>,
 ) -> Result<ApiResponse> {
@@ -32,7 +33,7 @@ pub async fn create(
    })
 }
 
-pub async fn show_list(State(api_state): State<ApiState>, claims: Claims) -> Result<ApiResponse> {
+pub async fn show_list(State(api_state): State<Arc<AppState>>, claims: Claims) -> Result<ApiResponse> {
    let task_list = api_state
       .user_data_table
       .get_task_list(claims.user_id)
@@ -46,7 +47,7 @@ pub async fn show_list(State(api_state): State<ApiState>, claims: Claims) -> Res
 }
 
 pub async fn update(
-   State(api_state): State<ApiState>,
+   State(api_state): State<Arc<AppState>>,
    claims: Claims,
    Json(payload): Json<Task>,
 ) -> Result<ApiResponse> {
@@ -63,7 +64,7 @@ pub async fn update(
 }
 
 pub async fn update_list(
-   State(api_state): State<ApiState>,
+   State(api_state): State<Arc<AppState>>,
    claims: Claims,
    Json(payload): Json<Vec<Task>>,
 ) -> Result<ApiResponse> {
@@ -80,7 +81,7 @@ pub async fn update_list(
 }
 
 pub async fn delete(
-   State(api_state): State<ApiState>,
+   State(api_state): State<Arc<AppState>>,
    claims: Claims,
    Path(task_id): Path<ObjectId>,
 ) -> Result<ApiResponse> {

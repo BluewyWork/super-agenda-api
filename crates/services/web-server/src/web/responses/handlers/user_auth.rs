@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::{extract::State, http::StatusCode};
 use lib_database::models::tables::user::User;
 use mongodb::bson::oid::ObjectId;
@@ -13,7 +15,7 @@ use crate::{
          token::create_token,
       },
    },
-   ApiState,
+    AppState,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -23,7 +25,7 @@ pub struct RegisterPayload {
 }
 
 pub async fn register(
-   State(api_state): State<ApiState>,
+   State(api_state): State<Arc<AppState>>,
    Json(register_payload): Json<RegisterPayload>,
 ) -> Result<ApiResponse> {
    let RegisterPayload {
@@ -63,7 +65,7 @@ pub struct LoginPayload {
 }
 
 pub async fn login(
-   State(api_state): State<ApiState>,
+   State(api_state): State<Arc<AppState>>,
    Json(login_payload): Json<LoginPayload>,
 ) -> Result<ApiResponse> {
    let LoginPayload {

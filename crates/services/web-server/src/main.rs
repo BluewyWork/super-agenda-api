@@ -21,7 +21,9 @@ pub mod web {
    pub mod routes;
 }
 
-use axum::{extract::FromRef, middleware::map_response, Router};
+use std::sync::Arc;
+
+use axum::{extract::FromRef, middleware::map_response, routing::post, Router};
 use lib_database::models::{
    database::DatabaseManager,
    tables::{admin::AdminTable, user::UserTable, user_data::UserDataTable},
@@ -29,7 +31,7 @@ use lib_database::models::{
 use lib_utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use tokio::net::TcpListener;
 
-use crate::web::{error::Result, responses::middlewares::map_response_from_error, routes};
+use crate::web::{error::Result, responses::{handlers::user_auth, middlewares::map_response_from_error}, routes};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -39,17 +41,15 @@ async fn main() -> Result<()> {
    let user_table = UserTable::from(database_manager.clone());
    let user_data_table = UserDataTable::from(database_manager);
 
-   let app_state = AppState {
-      api_state: ApiState {
-         admin_table,
-         user_table,
-         user_data_table,
-      },
-   };
+   let app_state = Arc::new(AppState {
+      admin_table,
+      user_table,
+      user_data_table,
+   });
 
    let app = Router::new()
-      .nest("/api/user", routes::user_routes(&app_state))
-      .nest("/api/admin", routes::admin_routes(&app_state))
+      .nest("/api/user", routes::user_routes(Arc::clone(&app_state)))
+      .nest("/api/admin", routes::admin_routes(Arc::clone(&app_state)))
       .layer(map_response(map_response_from_error));
 
    let listener = TcpListener::bind(SERVER_ADDRESS.to_string()).await.unwrap();
@@ -61,20 +61,9 @@ async fn main() -> Result<()> {
    Ok(())
 }
 
-#[derive(Clone)]
 pub struct AppState {
-   api_state: ApiState,
-}
-
-#[derive(Clone)]
-pub struct ApiState {
    admin_table: AdminTable,
    user_table: UserTable,
    user_data_table: UserDataTable,
 }
 
-impl FromRef<AppState> for ApiState {
-   fn from_ref(app_state: &AppState) -> ApiState {
-      app_state.api_state.clone()
-   }
-}
