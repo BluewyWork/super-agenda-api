@@ -19,7 +19,7 @@ pub struct LoginPayload {
 }
 
 pub async fn login(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    Json(login_payload): Json<LoginPayload>,
 ) -> Result<ApiResponse> {
    let LoginPayload {
@@ -27,7 +27,7 @@ pub async fn login(
       password: password_clear,
    } = login_payload;
 
-   let admin = api_state
+   let admin = app_state
       .admin_table
       .find_admin_from_username(&username)
       .await?;

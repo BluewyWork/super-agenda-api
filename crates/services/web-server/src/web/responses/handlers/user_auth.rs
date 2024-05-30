@@ -25,7 +25,7 @@ pub struct RegisterPayload {
 }
 
 pub async fn register(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    Json(register_payload): Json<RegisterPayload>,
 ) -> Result<ApiResponse> {
    let RegisterPayload {
@@ -49,7 +49,7 @@ pub async fn register(
       hashed_password,
    };
 
-   api_state.user_table.create_user(user).await?;
+   app_state.user_table.create_user(user).await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,
@@ -65,7 +65,7 @@ pub struct LoginPayload {
 }
 
 pub async fn login(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    Json(login_payload): Json<LoginPayload>,
 ) -> Result<ApiResponse> {
    let LoginPayload {
@@ -73,7 +73,7 @@ pub async fn login(
       password: password_clear,
    } = login_payload;
 
-   let user = api_state
+   let user = app_state
       .user_table
       .find_user_from_username(&username)
       .await?;

@@ -8,10 +8,10 @@ use crate::{
 };
 
 pub async fn show_user_list(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    _claims: Claims,
 ) -> Result<ApiResponse> {
-   let user_list = api_state.user_table.find_all_users().await?;
+   let user_list = app_state.user_table.find_all_users().await?;
 
    Ok(ApiResponse {
       message: None,

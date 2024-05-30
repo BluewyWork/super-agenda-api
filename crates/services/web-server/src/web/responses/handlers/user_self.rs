@@ -13,8 +13,8 @@ pub struct UserShowPayload {
    username: String,
 }
 
-pub async fn show(State(api_state): State<Arc<AppState>>, claims: Claims) -> Result<ApiResponse> {
-   let user = api_state
+pub async fn show(State(app_state): State<Arc<AppState>>, claims: Claims) -> Result<ApiResponse> {
+   let user = app_state
       .user_table
       .find_user_from_object_id(claims.user_id)
       .await?;
@@ -34,9 +34,9 @@ pub async fn update() -> Result<ApiResponse> {
    todo!()
 }
 
-pub async fn nuke(State(api_state): State<Arc<AppState>>, claims: Claims) -> Result<ApiResponse> {
-   api_state.user_table.delete_user(claims.user_id).await?;
-   api_state.user_data_table.delete(claims.user_id).await?;
+pub async fn nuke(State(app_state): State<Arc<AppState>>, claims: Claims) -> Result<ApiResponse> {
+   app_state.user_table.delete_user(claims.user_id).await?;
+   app_state.user_data_table.delete(claims.user_id).await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,

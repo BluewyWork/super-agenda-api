@@ -17,11 +17,11 @@ use crate::{
 };
 
 pub async fn create(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Json(task): Json<Task>,
 ) -> Result<ApiResponse> {
-   api_state
+   app_state
       .user_data_table
       .create_task(claims.user_id, task)
       .await?;
@@ -33,8 +33,8 @@ pub async fn create(
    })
 }
 
-pub async fn show_list(State(api_state): State<Arc<AppState>>, claims: Claims) -> Result<ApiResponse> {
-   let task_list = api_state
+pub async fn show_list(State(app_state): State<Arc<AppState>>, claims: Claims) -> Result<ApiResponse> {
+   let task_list = app_state
       .user_data_table
       .get_task_list(claims.user_id)
       .await?;
@@ -47,11 +47,11 @@ pub async fn show_list(State(api_state): State<Arc<AppState>>, claims: Claims) -
 }
 
 pub async fn update(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Json(payload): Json<Task>,
 ) -> Result<ApiResponse> {
-   api_state
+   app_state
       .user_data_table
       .update_task(claims.user_id, payload)
       .await?;
@@ -64,11 +64,11 @@ pub async fn update(
 }
 
 pub async fn update_list(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Json(payload): Json<Vec<Task>>,
 ) -> Result<ApiResponse> {
-   api_state
+   app_state
       .user_data_table
       .update_task_list(claims.user_id, payload)
       .await?;
@@ -81,11 +81,11 @@ pub async fn update_list(
 }
 
 pub async fn delete(
-   State(api_state): State<Arc<AppState>>,
+   State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Path(task_id): Path<ObjectId>,
 ) -> Result<ApiResponse> {
-   api_state
+   app_state
       .user_data_table
       .delete_task(claims.user_id, task_id)
       .await?;
