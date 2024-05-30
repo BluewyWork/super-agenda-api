@@ -9,7 +9,8 @@ use crate::{
       custom::{extractors::Json, response::ApiResponse},
       error::{Error, Result},
       utils::{password::matches, token::create_token},
-   }, AppState,
+   },
+   AppState,
 };
 
 #[derive(Serialize, Deserialize)]

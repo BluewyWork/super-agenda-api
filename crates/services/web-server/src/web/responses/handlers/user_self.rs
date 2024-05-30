@@ -5,7 +5,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
-   web::{custom::response::ApiResponse, error::Result, utils::token::Claims}, AppState,
+   web::{custom::response::ApiResponse, error::Result, utils::token::Claims},
+   AppState,
 };
 
 #[derive(Serialize, Deserialize)]

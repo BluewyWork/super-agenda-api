@@ -15,7 +15,7 @@ use crate::{
          token::create_token,
       },
    },
-    AppState,
+   AppState,
 };
 
 #[derive(Serialize, Deserialize)]

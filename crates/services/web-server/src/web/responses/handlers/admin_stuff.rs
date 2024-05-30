@@ -4,7 +4,8 @@ use axum::{extract::State, http::StatusCode};
 use serde_json::json;
 
 use crate::{
-   web::{custom::response::ApiResponse, error::Result, utils::token::Claims}, AppState,
+   web::{custom::response::ApiResponse, error::Result, utils::token::Claims},
+   AppState,
 };
 
 pub async fn show_user_list(

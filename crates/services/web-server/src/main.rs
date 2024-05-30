@@ -31,7 +31,7 @@ use lib_database::models::{
 use lib_utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use tokio::net::TcpListener;
 
-use crate::web::{error::Result, responses::{middlewares::map_response_from_error}, routes};
+use crate::web::{error::Result, responses::middlewares::map_response_from_error, routes};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -66,4 +66,3 @@ pub struct AppState {
    user_table: UserTable,
    user_data_table: UserDataTable,
 }
-
