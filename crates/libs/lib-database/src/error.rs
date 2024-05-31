@@ -11,6 +11,7 @@ pub enum Error {
 
    MongoDB(mongodb::error::Error),
    MongoDBBson(mongodb::bson::ser::Error),
+   MongoDBOID(mongodb::bson::oid::Error),
 }
 
 impl Display for Error {
@@ -23,6 +24,7 @@ impl Display for Error {
 
          Self::MongoDB(err) => err.to_string(),
          Self::MongoDBBson(err) => err.to_string(),
+         Self::MongoDBOID(err) => err.to_string(),
       };
 
       write!(f, "ERROR => {message}")
@@ -40,5 +42,11 @@ impl From<mongodb::error::Error> for Error {
 impl From<mongodb::bson::ser::Error> for Error {
    fn from(err: mongodb::bson::ser::Error) -> Self {
       Self::MongoDBBson(err)
+   }
+}
+
+impl From<mongodb::bson::oid::Error> for Error {
+   fn from(err: mongodb::bson::oid::Error) -> Self {
+      Self::MongoDBOID(err)
    }
 }

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use futures::TryStreamExt;
 use mongodb::{
    bson::{doc, oid::ObjectId, to_bson},
@@ -73,7 +75,9 @@ impl AdminTable {
       Ok(())
    }
 
-   pub async fn delete_admin(&self, admin_id: ObjectId) -> Result<()> {
+   pub async fn delete_admin(&self, admin_id: String) -> Result<()> {
+   let admin_id = ObjectId::from_str(&admin_id)?;
+
       self
          .admin_collection
          .delete_one(doc! {"_id": admin_id}, None)

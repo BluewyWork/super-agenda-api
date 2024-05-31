@@ -1,6 +1,9 @@
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
-use axum::{extract::State, http::StatusCode};
+use axum::{
+   extract::{Path, State},
+   http::StatusCode,
+};
 use lib_database::models::tables::admin::Admin;
 use mongodb::bson::oid::ObjectId;
 use serde_json::json;
@@ -51,7 +54,7 @@ pub async fn update(
 
 pub async fn delete(
    State(app_state): State<Arc<AppState>>,
-   Json(admin_id): Json<ObjectId>,
+   Path(admin_id): Path<String>,
 ) -> Result<ApiResponse> {
    app_state.admin_table.delete_admin(admin_id).await?;
 
