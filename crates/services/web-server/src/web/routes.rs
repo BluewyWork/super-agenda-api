@@ -48,7 +48,7 @@ pub fn admin_routes(app_state: Arc<AppState>) -> Router {
       .route("/new", post(admin_admin::new))
       .route("/show/all", get(admin_admin::show_all))
       .route("/update", post(admin_admin::update))
-      .route("/nuke", delete(admin_admin::delete))
+      .route("/nuke/:admin_id", delete(admin_admin::delete))
       .layer(from_fn(authenticate_user_or_admin))
       .with_state(Arc::clone(&app_state));
 
