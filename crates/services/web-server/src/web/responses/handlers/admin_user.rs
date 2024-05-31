@@ -4,7 +4,7 @@ use axum::{extract::State, http::StatusCode};
 use serde_json::json;
 
 use crate::{
-   web::{custom::response::ApiResponse, error::Result, utils::token::Claims},
+   web::{custom::response::ApiResponse, error::Result},
    AppState,
 };
 

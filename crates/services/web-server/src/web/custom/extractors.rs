@@ -1,7 +1,7 @@
 use axum::{
    async_trait,
    extract::{
-      rejection::{JsonRejection, PathRejection},
+      rejection::{JsonRejection},
       FromRequest, FromRequestParts,
    },
    http::request::Parts,
