@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use mongodb::{
    bson::{doc, oid::ObjectId, to_bson, DateTime},
    Collection,
@@ -130,7 +132,7 @@ impl UserDataTable {
 
    pub async fn update_task_list(&self, user_id: ObjectId, list: Vec<Task>) -> Result<()> {
       let filter = doc! { "owner": user_id };
-      let update = doc! { "$set": doc! { "list": to_bson(&list)? } };
+      let update = doc! { "$set": doc! { "task_list": to_bson(&list)? } };
 
       self
          .user_data_collection
@@ -140,7 +142,9 @@ impl UserDataTable {
       Ok(())
    }
 
-   pub async fn delete_task(&self, user_id: ObjectId, task_id: ObjectId) -> Result<()> {
+   pub async fn delete_task(&self, user_id: ObjectId, task_id: String) -> Result<()> {
+      let task_id = ObjectId::from_str(&task_id)?;
+
       let filter = doc! {"owner": user_id};
       let update = doc! {"$pull": doc! {"task_list": doc! {"_id": task_id}}};
 
