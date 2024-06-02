@@ -29,7 +29,7 @@ pub fn user_routes(app_state: Arc<AppState>) -> Router {
       .route("/show", get(user_tasks::show_list))
       .route("/update", post(user_tasks::update))
       .route("/update/list", post(user_tasks::update_list))
-      .route("/delete", patch(user_tasks::delete))
+      .route("/delete/:task_id", delete(user_tasks::delete))
       .layer(from_fn(authenticate_user_or_admin))
       .with_state(Arc::clone(&app_state));
 

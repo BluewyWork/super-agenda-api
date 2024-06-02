@@ -87,7 +87,7 @@ pub async fn update_list(
 pub async fn delete(
    State(app_state): State<Arc<AppState>>,
    claims: Claims,
-   Path(task_id): Path<ObjectId>,
+   Path(task_id): Path<String>,
 ) -> Result<ApiResponse> {
    app_state
       .user_data_table
