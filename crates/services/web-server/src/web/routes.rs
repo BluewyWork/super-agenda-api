@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use axum::{
    middleware::from_fn,
-   routing::{delete, get, patch, post},
+   routing::{delete, get, post},
    Router,
 };
 
