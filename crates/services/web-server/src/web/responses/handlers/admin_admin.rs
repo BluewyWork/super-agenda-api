@@ -1,4 +1,4 @@
-use std::{sync::Arc};
+use std::sync::Arc;
 
 use axum::{
    extract::{Path, State},
@@ -11,14 +11,21 @@ use crate::{
    web::{
       custom::{extractors::Json, response::ApiResponse},
       error::Result,
+      utils::password::hash_password,
    },
    AppState,
 };
 
 pub async fn new(
    State(app_state): State<Arc<AppState>>,
-   Json(admin): Json<Admin>,
+   Json(admin_payload): Json<Admin>,
 ) -> Result<ApiResponse> {
+   let admin = Admin {
+      id: admin_payload.id,
+      username: admin_payload.username,
+      hashed_password: hash_password(&admin_payload.hashed_password)?,
+   };
+
    app_state.admin_table.create_admin(admin).await?;
 
    Ok(ApiResponse {
