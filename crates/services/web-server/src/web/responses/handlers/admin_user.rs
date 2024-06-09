@@ -8,9 +8,7 @@ use crate::{
    AppState,
 };
 
-pub async fn show_user_list(
-   State(app_state): State<Arc<AppState>>,
-) -> Result<ApiResponse> {
+pub async fn show_user_list(State(app_state): State<Arc<AppState>>) -> Result<ApiResponse> {
    let user_list = app_state.user_table.find_all_users().await?;
 
    Ok(ApiResponse {

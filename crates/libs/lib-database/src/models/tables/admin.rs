@@ -76,7 +76,7 @@ impl AdminTable {
    }
 
    pub async fn delete_admin(&self, admin_id: String) -> Result<()> {
-   let admin_id = ObjectId::from_str(&admin_id)?;
+      let admin_id = ObjectId::from_str(&admin_id)?;
 
       self
          .admin_collection

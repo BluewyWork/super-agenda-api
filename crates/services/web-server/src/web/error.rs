@@ -13,6 +13,7 @@ pub enum Error {
    UsernameTooShort,
    PasswordTooShort,
    PasswordDoesNotMatch,
+   UsernameIsTaken,
    TokenDaysOverflow,
    TokenNotFound,
    ClaimsNotFound,
@@ -36,6 +37,8 @@ impl Error {
       match self {
          Self::JsonExtraction => (StatusCode::BAD_REQUEST, ClientError::UNEXPECTED_BODY),
          Self::PasswordDoesNotMatch => (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS),
+         Self::UsernameIsTaken => (StatusCode::CONFLICT, ClientError::USERNAME_IS_TAKEN),
+
          Self::ClaimsNotFound | Self::TokenNotFound => {
             (StatusCode::BAD_REQUEST, ClientError::INVALID_CREDENTIALS)
          },
@@ -68,18 +71,20 @@ pub enum ClientError {
    INVALID_CREDENTIALS,
    UNEXPECTED_BODY,
    SERVICE_ERROR,
+   USERNAME_IS_TAKEN,
 }
 
 impl Display for Error {
    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
       let message = match self {
          Self::JsonExtraction => String::from("json signature does not match"),
-         Self::PasswordTooShort => String::from("password too short. 5 characters min."),
+         Self::PasswordTooShort => String::from("password too short. 5 characters min"),
          Self::UsernameTooShort => String::from("username too short. 5 characters min"),
          Self::PasswordDoesNotMatch => String::from("password does not match"),
          Self::TokenDaysOverflow => String::from("unable to create token due to size overflow"),
          Self::TokenNotFound => String::from("no token found"),
          Self::ClaimsNotFound => String::from("claims not found"),
+         Self::UsernameIsTaken => String::from("username is taken"),
 
          Self::Bcrypt(string) => string.to_string(),
          Self::LibDatabase(err) => err.to_string(),

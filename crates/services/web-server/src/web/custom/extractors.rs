@@ -1,9 +1,6 @@
 use axum::{
    async_trait,
-   extract::{
-      rejection::{JsonRejection},
-      FromRequest, FromRequestParts,
-   },
+   extract::{rejection::JsonRejection, FromRequest, FromRequestParts},
    http::request::Parts,
    response::IntoResponse,
 };

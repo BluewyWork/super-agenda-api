@@ -49,6 +49,15 @@ pub async fn register(
       hashed_password,
    };
 
+   if (app_state
+      .user_table
+      .find_user_from_username(&user.username)
+      .await)
+      .is_ok()
+   {
+      return Err(Error::UsernameIsTaken);
+   };
+
    app_state.user_table.create_user(user).await?;
 
    Ok(ApiResponse {

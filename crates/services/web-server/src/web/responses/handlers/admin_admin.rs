@@ -10,7 +10,7 @@ use serde_json::json;
 use crate::{
    web::{
       custom::{extractors::Json, response::ApiResponse},
-      error::Result,
+      error::{Error, Result},
       utils::password::hash_password,
    },
    AppState,
@@ -25,6 +25,15 @@ pub async fn new(
       username: admin_payload.username,
       hashed_password: hash_password(&admin_payload.hashed_password)?,
    };
+
+   if app_state
+      .admin_table
+      .find_admin_from_username(&admin.username)
+      .await
+      .is_ok()
+   {
+      return Err(Error::UsernameIsTaken);
+   }
 
    app_state.admin_table.create_admin(admin).await?;
 
@@ -49,6 +58,15 @@ pub async fn update(
    State(app_state): State<Arc<AppState>>,
    Json(admin): Json<Admin>,
 ) -> Result<ApiResponse> {
+   if app_state
+      .admin_table
+      .find_admin_from_username(&admin.username)
+      .await
+      .is_ok()
+   {
+      return Err(Error::UsernameIsTaken);
+   }
+
    app_state.admin_table.update_admin(admin).await?;
 
    Ok(ApiResponse {
