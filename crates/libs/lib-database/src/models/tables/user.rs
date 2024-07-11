@@ -18,8 +18,6 @@ pub struct User {
    pub hashed_password: String,
 }
 
-// Axum state extractor requires clone trait.
-#[derive(Clone)]
 pub struct UserTable {
    users_collection: Collection<User>,
 }

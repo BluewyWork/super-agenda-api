@@ -1,7 +1,6 @@
 [workspace]
 members = [
   "crates/libs/lib-database",
-  "crates/libs/lib-database-v2",
   "crates/libs/lib-utils",
   "crates/services/web-server",
   "crates/services/web-test",
