@@ -1,8 +1,9 @@
 [workspace]
 members = [
+  "crates/bin/server-2",
   "crates/libs/lib-database",
   "crates/libs/lib-utils",
-  "crates/services/web-server",
-  "crates/services/web-test",
+  "crates/bin/server",
+  "crates/bin/test",
 ]
 resolver = "2"
