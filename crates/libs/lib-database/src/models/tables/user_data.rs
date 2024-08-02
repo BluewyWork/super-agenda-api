@@ -61,24 +61,6 @@ impl UserDataTable {
    // Task related stuff.
 
    pub async fn create_task(&self, user_id: ObjectId, task: Task) -> Result<()> {
-      if (self
-         .user_data_collection
-         .find_one(doc! {"owner": user_id }, None)
-         .await?)
-         .is_none()
-      {
-         let user_data = UserData {
-            id: ObjectId::new(),
-            owner: user_id,
-            task_list: Vec::new(),
-         };
-
-         self
-            .user_data_collection
-            .insert_one(user_data.clone(), None)
-            .await?;
-      };
-
       let update = doc! {
          "$push": doc! {
             "task_list": to_bson(&task).unwrap()
@@ -152,6 +134,28 @@ impl UserDataTable {
          .user_data_collection
          .update_one(filter, update, None)
          .await?;
+
+      Ok(())
+   }
+
+   pub async fn initialize_userdata(&self, user_id: ObjectId) -> Result<()> {
+      if (self
+         .user_data_collection
+         .find_one(doc! {"owner": user_id }, None)
+         .await?)
+         .is_none()
+      {
+         let user_data = UserData {
+            id: ObjectId::new(),
+            owner: user_id,
+            task_list: Vec::new(),
+         };
+
+         self
+            .user_data_collection
+            .insert_one(user_data.clone(), None)
+            .await?;
+      };
 
       Ok(())
    }

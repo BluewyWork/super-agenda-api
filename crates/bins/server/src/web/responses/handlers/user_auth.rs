@@ -58,7 +58,16 @@ pub async fn register(
       return Err(Error::UsernameIsTaken);
    };
 
+   let user_id_copy = user.id;
+
    app_state.user_table.create_user(user).await?;
+
+   // always initialize user_data
+   // and avoid other considerations if not
+   app_state
+      .user_data_table
+      .initialize_userdata(user_id_copy)
+      .await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,
