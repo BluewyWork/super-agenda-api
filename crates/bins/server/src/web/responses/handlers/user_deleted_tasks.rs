@@ -13,7 +13,7 @@ pub async fn create(
 ) -> Result<ApiResponse> {
    app_state
       .user_data_table
-      .add_deleted_task(object_id, claims.user_id)
+      .add_deleted_task(object_id.to_string(), claims.user_id)
       .await?;
 
    Ok(ApiResponse {
