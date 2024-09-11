@@ -11,6 +11,7 @@ pub mod web {
          pub mod user_auth;
          pub mod user_self;
          pub mod user_tasks;
+         pub mod user_deleted_tasks;
       }
       pub mod middlewares;
    }

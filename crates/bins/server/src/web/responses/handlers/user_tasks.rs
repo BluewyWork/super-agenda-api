@@ -90,7 +90,12 @@ pub async fn delete(
 ) -> Result<ApiResponse> {
    app_state
       .user_data_table
-      .delete_task(claims.user_id, task_id)
+      .delete_task(claims.user_id, task_id.clone())
+      .await?;
+
+   app_state
+      .user_data_table
+      .add_deleted_task(task_id, claims.user_id)
       .await?;
 
    Ok(ApiResponse {

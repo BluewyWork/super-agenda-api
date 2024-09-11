@@ -17,6 +17,7 @@ pub struct UserData {
    id: ObjectId,
    owner: ObjectId,
    task_list: Vec<Task>,
+   deleted_tasks: Vec<ObjectId>
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -28,6 +29,7 @@ pub struct Task {
    pub status: TaskStatus,
    pub start_date_time: Option<DateTime>,
    pub end_date_time: Option<DateTime>,
+   pub last_modified: DateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -149,6 +151,7 @@ impl UserDataTable {
             id: ObjectId::new(),
             owner: user_id,
             task_list: Vec::new(),
+            deleted_tasks: Vec::new()
          };
 
          self
@@ -156,6 +159,35 @@ impl UserDataTable {
             .insert_one(user_data.clone(), None)
             .await?;
       };
+
+      Ok(())
+   }
+
+   pub async fn get_deleted_task_list(&self, user_id: ObjectId) -> Result<Vec<ObjectId>> {
+      let filter = doc! { "owner": user_id };
+
+      let user_data = match self.user_data_collection.find_one(filter, None).await? {
+         Some(user_data) => user_data,
+         None => return Err(Error::UnableToFindUserData),
+      };
+
+      Ok(user_data.deleted_tasks)
+   }
+   
+
+   pub async fn add_deleted_task(&self, deleted_task_id: String, user_id: ObjectId) -> Result<()> {
+      let deleted_task_id = ObjectId::from_str(&deleted_task_id)?;
+
+      let update = doc! {
+         "$push": doc! {
+            "deleted_tasks": deleted_task_id
+         }
+      };
+
+      self
+         .user_data_collection
+         .update_one(doc! {"owner": user_id}, update, None)
+         .await?;
 
       Ok(())
    }
