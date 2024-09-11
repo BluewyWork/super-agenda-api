@@ -7,7 +7,9 @@ use axum::{
 };
 
 use super::responses::{
-   handlers::{admin_admin, admin_auth, admin_user, user_auth, user_deleted_tasks, user_self, user_tasks},
+   handlers::{
+      admin_admin, admin_auth, admin_user, user_auth, user_deleted_tasks, user_self, user_tasks,
+   },
    middlewares::authenticate_user_or_admin,
 };
 use crate::AppState;
@@ -33,10 +35,11 @@ pub fn user_routes(app_state: Arc<AppState>) -> Router {
       .layer(from_fn(authenticate_user_or_admin))
       .with_state(Arc::clone(&app_state));
 
-    let user_deleted_task_routes = Router::new()
-       .route("/add", post(user_deleted_tasks::create))
-       .route("/show",  get(user_tasks::show_list))
-       .with_state(Arc::clone(&app_state));
+   let user_deleted_task_routes = Router::new()
+      .route("/add", post(user_deleted_tasks::create))
+      .route("/show", get(user_tasks::show_list))
+      .layer(from_fn(authenticate_user_or_admin))
+      .with_state(Arc::clone(&app_state));
 
    Router::new()
       .nest("/auth", user_auth_routes)
