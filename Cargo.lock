@@ -1479,6 +1479,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "server"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "bcrypt",
+ "chrono",
+ "jsonwebtoken",
+ "lib-database",
+ "lib-utils",
+ "mongodb",
+ "regex",
+ "serde",
+ "serde_json",
+ "strum_macros",
+ "tokio",
+]
+
+[[package]]
 name = "server-2"
 version = "0.1.0"
 dependencies = [
@@ -2003,24 +2021,6 @@ name = "wasm-bindgen-shared"
 version = "0.2.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "af190c94f2773fdb3729c55b007a722abb5384da03bc0986df4c289bf5567e96"
-
-[[package]]
-name = "web-server"
-version = "0.1.0"
-dependencies = [
- "axum",
- "bcrypt",
- "chrono",
- "jsonwebtoken",
- "lib-database",
- "lib-utils",
- "mongodb",
- "regex",
- "serde",
- "serde_json",
- "strum_macros",
- "tokio",
-]
 
 [[package]]
 name = "web-test"

@@ -4,6 +4,6 @@ members = [
   "crates/libs/lib-database",
   "crates/libs/lib-utils",
   "crates/bins/server",
-  "crates/bins/test",
+  "crates/bins/playground",
 ]
 resolver = "2"
