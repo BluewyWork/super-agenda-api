@@ -5,8 +5,7 @@ use lib_database::models::{
 };
 
 pub fn routes() -> Router {
-   Router::new()
-      .route("/rpc", post(|| async {}));
+   Router::new().route("/rpc", post(|| async {}));
 
    todo!()
 }
