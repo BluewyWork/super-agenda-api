@@ -1,9 +1,9 @@
 [package]
+edition = "2021"
 name = "lib-utils"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
-lazy_static = "1.4.0"
 dotenvy = "0.15.7"
 dotenvy_macro = "0.15.7"
+lazy_static = "1.4.0"
