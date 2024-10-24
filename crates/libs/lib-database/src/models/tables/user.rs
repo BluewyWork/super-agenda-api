@@ -30,7 +30,7 @@ impl UserTable {
    }
 
    pub async fn find_all_users(&self) -> Result<Vec<User>> {
-      let mut maybe_user_list = self.users_collection.find(doc! {}, None).await?;
+      let mut maybe_user_list = self.users_collection.find(doc! {}).await?;
 
       let mut user_list: Vec<User> = Vec::new();
 
@@ -44,7 +44,7 @@ impl UserTable {
    pub async fn find_user_from_username(&self, username: &str) -> Result<User> {
       let user = match self
          .users_collection
-         .find_one(doc! {"username": username}, None)
+         .find_one(doc! {"username": username})
          .await?
       {
          Some(user) => user,
@@ -57,7 +57,7 @@ impl UserTable {
    pub async fn find_user_from_object_id(&self, user_id: ObjectId) -> Result<User> {
       let user = match self
          .users_collection
-         .find_one(doc! {"_id": user_id}, None)
+         .find_one(doc! {"_id": user_id})
          .await?
       {
          Some(user) => user,
@@ -68,7 +68,7 @@ impl UserTable {
    }
 
    pub async fn create_user(&self, user: User) -> Result<()> {
-      self.users_collection.insert_one(user, None).await?;
+      self.users_collection.insert_one(user).await?;
 
       Ok(())
    }
@@ -82,7 +82,7 @@ impl UserTable {
    pub async fn delete_user(&self, _id: ObjectId) -> Result<()> {
       self
          .users_collection
-         .delete_one(doc! {"_id": _id}, None)
+         .delete_one(doc! {"_id": _id})
          .await?;
 
       Ok(())

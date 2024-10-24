@@ -35,7 +35,7 @@ impl AdminTable {
    pub async fn find_admin_from_username(&self, username: &str) -> Result<Admin> {
       let admin = match self
          .admin_collection
-         .find_one(doc! {"username": username}, None)
+         .find_one(doc! {"username": username})
          .await?
       {
          Some(admin) => admin,
@@ -46,7 +46,7 @@ impl AdminTable {
    }
 
    pub async fn find_all(&self) -> Result<Vec<Admin>> {
-      let mut maybe_admin_list = self.admin_collection.find(doc! {}, None).await?;
+      let mut maybe_admin_list = self.admin_collection.find(doc! {}).await?;
 
       let mut admin_list: Vec<Admin> = Vec::new();
 
@@ -58,7 +58,7 @@ impl AdminTable {
    }
 
    pub async fn create_admin(&self, admin: Admin) -> Result<()> {
-      self.admin_collection.insert_one(admin, None).await?;
+      self.admin_collection.insert_one(admin).await?;
 
       Ok(())
    }
@@ -69,7 +69,7 @@ impl AdminTable {
 
       self
          .admin_collection
-         .update_one(filter, update_query, None)
+         .update_one(filter, update_query)
          .await?;
 
       Ok(())
@@ -80,7 +80,7 @@ impl AdminTable {
 
       self
          .admin_collection
-         .delete_one(doc! {"_id": admin_id}, None)
+         .delete_one(doc! {"_id": admin_id})
          .await?;
 
       Ok(())
