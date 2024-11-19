@@ -12,11 +12,18 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum Membership {
+   FREE,
+   PREMIUM,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserData {
    #[serde(rename = "_id")]
    id: ObjectId,
    owner: ObjectId,
    task_list: Vec<Task>,
+   membership: Membership,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -51,6 +58,15 @@ impl UserDataTable {
 
    // UserData related stuff.
 
+   async fn get_user_data(&self, user_id: ObjectId) -> Result<UserData> {
+      let filter = doc! { "owner": user_id };
+
+      match self.user_data_collection.find_one(filter).await? {
+         Some(user_data) => Ok(user_data),
+         None => Err(Error::UnableToFindUserData),
+      }
+   }
+
    pub async fn delete(&self, user_id: ObjectId) -> Result<()> {
       let filter = doc! { "owner": user_id };
       self.user_data_collection.delete_one(filter).await?;
@@ -76,12 +92,7 @@ impl UserDataTable {
    }
 
    pub async fn get_task_list(&self, user_id: ObjectId) -> Result<Vec<Task>> {
-      let filter = doc! { "owner": user_id };
-
-      let user_data = match self.user_data_collection.find_one(filter).await? {
-         Some(user_data) => user_data,
-         None => return Err(Error::UnableToFindUserData),
-      };
+      let user_data = self.get_user_data(user_id).await?;
 
       Ok(user_data.task_list)
    }
@@ -137,6 +148,7 @@ impl UserDataTable {
             id: ObjectId::new(),
             owner: user_id,
             task_list: Vec::new(),
+            membership: Membership::FREE,
          };
 
          self
@@ -146,5 +158,11 @@ impl UserDataTable {
       };
 
       Ok(())
+   }
+
+   pub async fn get_membership(&self, user_id: ObjectId) -> Result<Membership> {
+      let user_data = self.get_user_data(user_id).await?;
+
+      Ok(user_data.membership)
    }
 }
