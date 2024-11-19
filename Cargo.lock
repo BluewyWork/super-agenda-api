@@ -412,6 +412,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8566979429cf69b49a5c740c60791108e86440e8be149bbea4fe54d2c32d6e2"
 
 [[package]]
+name = "database"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "mongodb 3.1.0",
+ "serde",
+]
+
+[[package]]
 name = "deranged"
 version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -970,24 +979,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbd2bcb4c963f2ddae06a2efc7e9f3591312473c50c6685e1f298068316e66fe"
 
 [[package]]
-name = "lib-database"
-version = "0.1.0"
-dependencies = [
- "futures",
- "mongodb 3.1.0",
- "serde",
-]
-
-[[package]]
-name = "lib-utils"
-version = "0.1.0"
-dependencies = [
- "dotenvy",
- "dotenvy_macro",
- "lazy_static",
-]
-
-[[package]]
 name = "libc"
 version = "0.2.155"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1325,12 +1316,12 @@ name = "playground"
 version = "0.1.0"
 dependencies = [
  "bcrypt",
- "lib-database",
- "lib-utils",
+ "database",
  "mongodb 2.8.2",
  "serde",
  "serde_json",
  "tokio",
+ "utils",
 ]
 
 [[package]]
@@ -1719,26 +1710,15 @@ dependencies = [
  "axum",
  "bcrypt",
  "chrono",
+ "database",
  "jsonwebtoken",
- "lib-database",
- "lib-utils",
  "mongodb 3.1.0",
  "regex",
  "serde",
  "serde_json",
  "strum_macros",
  "tokio",
-]
-
-[[package]]
-name = "server-2"
-version = "0.1.0"
-dependencies = [
- "axum",
- "lib-database",
- "serde",
- "serde_json",
- "thiserror",
+ "utils",
 ]
 
 [[package]]
@@ -2196,6 +2176,15 @@ dependencies = [
  "form_urlencoded",
  "idna 0.5.0",
  "percent-encoding",
+]
+
+[[package]]
+name = "utils"
+version = "0.1.0"
+dependencies = [
+ "dotenvy",
+ "dotenvy_macro",
+ "lazy_static",
 ]
 
 [[package]]

@@ -4,13 +4,13 @@ use axum::{
    extract::{Path, State},
    http::StatusCode,
 };
-use lib_database::models::tables::admin::Admin;
+use database::models::tables::admin::Admin;
 use serde_json::json;
 
 use crate::{
+   error::{AppError, AppResult},
    web::{
       custom::{extractors::Json, response::ApiResponse},
-      error::{Error, Result},
       utils::password::hash_password,
    },
    AppState,
@@ -19,7 +19,7 @@ use crate::{
 pub async fn new(
    State(app_state): State<Arc<AppState>>,
    Json(admin_payload): Json<Admin>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    let admin = Admin {
       id: admin_payload.id,
       username: admin_payload.username,
@@ -32,7 +32,7 @@ pub async fn new(
       .await
       .is_ok()
    {
-      return Err(Error::UsernameIsTaken);
+      return Err(AppError::UsernameIsTaken);
    }
 
    app_state.admin_table.create_admin(admin).await?;
@@ -44,7 +44,7 @@ pub async fn new(
    })
 }
 
-pub async fn show_all(State(app_state): State<Arc<AppState>>) -> Result<ApiResponse> {
+pub async fn show_all(State(app_state): State<Arc<AppState>>) -> AppResult<ApiResponse> {
    let admin_list = app_state.admin_table.find_all().await?;
 
    Ok(ApiResponse {
@@ -57,14 +57,14 @@ pub async fn show_all(State(app_state): State<Arc<AppState>>) -> Result<ApiRespo
 pub async fn update(
    State(app_state): State<Arc<AppState>>,
    Json(admin): Json<Admin>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    if app_state
       .admin_table
       .find_admin_from_username(&admin.username)
       .await
       .is_ok()
    {
-      return Err(Error::UsernameIsTaken);
+      return Err(AppError::UsernameIsTaken);
    }
 
    app_state.admin_table.update_admin(admin).await?;
@@ -79,7 +79,7 @@ pub async fn update(
 pub async fn delete(
    State(app_state): State<Arc<AppState>>,
    Path(admin_id): Path<String>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    app_state.admin_table.delete_admin(admin_id).await?;
 
    Ok(ApiResponse {

@@ -6,10 +6,10 @@ use axum::{
 };
 use serde::Serialize;
 
-use crate::web::{error::Error, utils::token::Claims};
+use crate::{error::AppError, web::utils::token::Claims};
 
 #[derive(FromRequest)]
-#[from_request(via(axum::Json), rejection(Error))]
+#[from_request(via(axum::Json), rejection(AppError))]
 pub struct Json<T>(pub T);
 
 impl<T: Serialize> IntoResponse for Json<T> {
@@ -19,7 +19,7 @@ impl<T: Serialize> IntoResponse for Json<T> {
    }
 }
 
-impl From<JsonRejection> for Error {
+impl From<JsonRejection> for AppError {
    fn from(_rejection: JsonRejection) -> Self {
       Self::JsonExtraction
    }
@@ -27,13 +27,13 @@ impl From<JsonRejection> for Error {
 
 #[async_trait]
 impl<S: Send + Sync> FromRequestParts<S> for Claims {
-   type Rejection = Error;
+   type Rejection = AppError;
 
    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Self::Rejection> {
       parts
          .extensions
          .get::<Claims>()
          .cloned()
-         .ok_or(Error::ClaimsNotFound)
+         .ok_or(AppError::ClaimsNotFound)
    }
 }

@@ -1,14 +1,15 @@
 use std::sync::Arc;
 
 use axum::{extract::State, http::StatusCode};
-use lib_database::models::tables::user_data::Membership;
+use database::models::tables::user_data::Membership;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
-   web::{custom::response::ApiResponse, error::Result},
+   web::{custom::response::ApiResponse},
    AppState,
+ error::AppResult
 };
 
 #[derive(Deserialize, Serialize)]
@@ -19,7 +20,7 @@ pub struct UserForAdminView {
    pub membership: Membership
 }
 
-pub async fn show_user_list(State(app_state): State<Arc<AppState>>) -> Result<ApiResponse> {
+pub async fn show_user_list(State(app_state): State<Arc<AppState>>) -> AppResult<ApiResponse> {
    let user_list = app_state.user_table.find_all_users().await?;
 
    let mut user_for_admin_view_list: Vec<UserForAdminView> = Vec::new();
@@ -41,4 +42,8 @@ pub async fn show_user_list(State(app_state): State<Arc<AppState>>) -> Result<Ap
       status_code: StatusCode::OK,
       data: Some(json!(user_for_admin_view_list)),
    })
+}
+
+pub async fn update_user_membership(State(app_state): State<Arc<AppState>>) -> AppResult<ApiResponse> {
+   todo!()
 }

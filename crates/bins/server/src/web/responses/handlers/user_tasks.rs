@@ -4,23 +4,23 @@ use axum::{
    extract::{Path, State},
    http::StatusCode,
 };
-use lib_database::models::tables::user_data::Task;
+use database::models::tables::user_data::Task;
 use serde_json::json;
 
 use crate::{
    web::{
       custom::{extractors::Json, response::ApiResponse},
-      error::Result,
       utils::token::Claims,
    },
    AppState,
+      error::AppResult,
 };
 
 pub async fn create(
    State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Json(task): Json<Task>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    app_state
       .user_data_table
       .create_task(claims.user_id, task)
@@ -36,7 +36,7 @@ pub async fn create(
 pub async fn show_list(
    State(app_state): State<Arc<AppState>>,
    claims: Claims,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    let task_list = app_state
       .user_data_table
       .get_task_list(claims.user_id)
@@ -53,7 +53,7 @@ pub async fn update(
    State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Json(payload): Json<Task>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    app_state
       .user_data_table
       .update_task(claims.user_id, payload)
@@ -70,7 +70,7 @@ pub async fn update_list(
    State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Json(payload): Json<Vec<Task>>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    app_state
       .user_data_table
       .update_task_list(claims.user_id, payload)
@@ -87,7 +87,7 @@ pub async fn delete(
    State(app_state): State<Arc<AppState>>,
    claims: Claims,
    Path(task_id): Path<String>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    app_state
       .user_data_table
       .delete_task(claims.user_id, task_id)

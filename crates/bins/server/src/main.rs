@@ -18,26 +18,32 @@ pub mod web {
       pub mod password;
       pub mod token;
    }
-   pub mod error;
-   pub mod routes;
 }
+pub mod error;
 
-use std::sync::Arc;
-
-use axum::{middleware::map_response, Router};
-use lib_database::models::{
+use axum::{
+   middleware::{from_fn, map_response},
+   routing::{delete, get, patch, post},
+   Router,
+};
+use database::models::{
    database::DatabaseManager,
    tables::{admin::AdminTable, user::UserTable, user_data::UserDataTable},
 };
-use lib_utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
+use std::sync::Arc;
 use tokio::net::TcpListener;
+use utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
+use web::responses::{
+   handlers::{admin_admin, admin_user, user_self, user_tasks},
+   middlewares::authenticate_user_or_admin,
+};
 
-use crate::web::{error::Result, responses::middlewares::map_response_from_error, routes};
+use crate::error::AppResult;
+use crate::web::responses::middlewares::map_response_from_error;
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> AppResult<()> {
    let database_manager = DatabaseManager::from(&MONGO_URI, &MONGO_DB).await.unwrap();
-
    let admin_table = AdminTable::from(database_manager.clone());
    let user_table = UserTable::from(database_manager.clone());
    let user_data_table = UserDataTable::from(database_manager);
@@ -49,14 +55,27 @@ async fn main() -> Result<()> {
    });
 
    let app = Router::new()
-      .nest("/api/user", routes::user_routes(Arc::clone(&app_state)))
-      .nest("/api/admin", routes::admin_routes(Arc::clone(&app_state)))
+      .nest(
+         "/api",
+         Router::new()
+            .route("/admins", post(admin_admin::new))
+            .route("/admins", get(admin_admin::show_all))
+            .route("/admins/:id", patch(admin_admin::update))
+            .route("/admins/:id", delete(admin_admin::delete))
+            .route("/users", get(admin_user::show_user_list))
+            .route("/users/self", patch(user_self::update))
+            .route("/users/self", delete(user_self::nuke))
+            .route("/users/self/tasks", post(user_tasks::create))
+            .route("/users/self/tasks", get(user_tasks::show_list))
+            .route("/users/self/tasks", patch(user_tasks::update))
+            .route("/users/self/tasks", delete(user_tasks::delete))
+            .layer(from_fn(authenticate_user_or_admin))
+            .with_state(Arc::clone(&app_state)),
+      )
       .layer(map_response(map_response_from_error));
 
    let listener = TcpListener::bind(SERVER_ADDRESS.to_string()).await.unwrap();
-
    println!("Server running on {}", *SERVER_ADDRESS);
-
    axum::serve(listener, app).await.unwrap();
 
    Ok(())

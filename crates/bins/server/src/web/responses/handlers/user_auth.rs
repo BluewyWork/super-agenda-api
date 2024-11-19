@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use axum::{extract::State, http::StatusCode};
-use lib_database::models::tables::user::User;
+use database::models::tables::user::User;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -9,13 +9,14 @@ use serde_json::json;
 use crate::{
    web::{
       custom::{extractors::Json, response::ApiResponse},
-      error::{Error, Result},
       utils::{
          password::{hash_password, matches},
          token::create_token,
       },
    },
    AppState,
+
+      error::{AppError, AppResult},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -27,18 +28,18 @@ pub struct RegisterPayload {
 pub async fn register(
    State(app_state): State<Arc<AppState>>,
    Json(register_payload): Json<RegisterPayload>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    let RegisterPayload {
       username,
       password: password_clear,
    } = register_payload;
 
    if username.len() < 5 {
-      return Err(Error::UsernameTooShort);
+      return Err(AppError::UsernameTooShort);
    }
 
    if password_clear.len() < 5 {
-      return Err(Error::PasswordTooShort);
+      return Err(AppError::PasswordTooShort);
    }
 
    let hashed_password = hash_password(&password_clear)?;
@@ -55,7 +56,7 @@ pub async fn register(
       .await)
       .is_ok()
    {
-      return Err(Error::UsernameIsTaken);
+      return Err(AppError::UsernameIsTaken);
    };
 
    let user_id_copy = user.id;
@@ -85,7 +86,7 @@ pub struct LoginPayload {
 pub async fn login(
    State(app_state): State<Arc<AppState>>,
    Json(login_payload): Json<LoginPayload>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    let LoginPayload {
       username,
       password: password_clear,
@@ -99,7 +100,7 @@ pub async fn login(
    let is_same = matches(password_clear, &user.hashed_password)?;
 
    if !is_same {
-      return Err(Error::PasswordDoesNotMatch);
+      return Err(AppError::PasswordDoesNotMatch);
    }
 
    let token = create_token(user.id)?;

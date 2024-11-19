@@ -7,10 +7,10 @@ use serde_json::json;
 use crate::{
    web::{
       custom::{extractors::Json, response::ApiResponse},
-      error::{Error, Result},
       utils::{password::matches, token::create_token},
    },
    AppState,
+      error::{AppError, AppResult},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -22,7 +22,7 @@ pub struct LoginPayload {
 pub async fn login(
    State(app_state): State<Arc<AppState>>,
    Json(login_payload): Json<LoginPayload>,
-) -> Result<ApiResponse> {
+) -> AppResult<ApiResponse> {
    let LoginPayload {
       username,
       password: password_clear,
@@ -36,7 +36,7 @@ pub async fn login(
    let is_same = matches(password_clear, &admin.hashed_password)?;
 
    if !is_same {
-      return Err(Error::PasswordDoesNotMatch);
+      return Err(AppError::PasswordDoesNotMatch);
    }
 
    let token = create_token(admin.id)?;

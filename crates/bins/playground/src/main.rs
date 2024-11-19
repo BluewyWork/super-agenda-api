@@ -1,10 +1,10 @@
-use lib_database::models::{
+use database::models::{
    database::DatabaseManager,
    tables::
       admin::{Admin, AdminTable}
    ,
 };
-use lib_utils::constants::{MONGO_DB, MONGO_URI};
+use utils::constants::{MONGO_DB, MONGO_URI};
 use mongodb::bson::oid::ObjectId;
 
 #[tokio::main]

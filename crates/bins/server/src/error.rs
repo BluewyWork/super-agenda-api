@@ -5,10 +5,10 @@ use axum::{
    response::{IntoResponse, Response},
 };
 
-pub type Result<T> = core::result::Result<T, Error>;
+pub type AppResult<T> = core::result::Result<T, AppError>;
 
 #[derive(Debug, Clone)]
-pub enum Error {
+pub enum AppError {
    JsonExtraction,
    UsernameTooShort,
    PasswordTooShort,
@@ -18,12 +18,12 @@ pub enum Error {
    TokenNotFound,
    ClaimsNotFound,
 
-   LibDatabase(lib_database::error::Error),
+   LibDatabase(database::error::Error),
    Bcrypt(String),
    JsonWebToken(jsonwebtoken::errors::Error),
 }
 
-impl IntoResponse for Error {
+impl IntoResponse for AppError {
    fn into_response(self) -> Response {
       let mut response = StatusCode::INTERNAL_SERVER_ERROR.into_response();
       response.extensions_mut().insert(self);
@@ -32,7 +32,7 @@ impl IntoResponse for Error {
    }
 }
 
-impl Error {
+impl AppError {
    pub fn client_status_and_error(&self) -> (StatusCode, ClientError) {
       match self {
          Self::JsonExtraction => (StatusCode::BAD_REQUEST, ClientError::UNEXPECTED_BODY),
@@ -74,7 +74,7 @@ pub enum ClientError {
    USERNAME_IS_TAKEN,
 }
 
-impl Display for Error {
+impl Display for AppError {
    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
       let message = match self {
          Self::JsonExtraction => String::from("json signature does not match"),
@@ -95,19 +95,19 @@ impl Display for Error {
    }
 }
 
-impl From<lib_database::error::Error> for Error {
-   fn from(err: lib_database::error::Error) -> Self {
+impl From<database::error::Error> for AppError {
+   fn from(err: database::error::Error) -> Self {
       Self::LibDatabase(err)
    }
 }
 
-impl From<bcrypt::BcryptError> for Error {
+impl From<bcrypt::BcryptError> for AppError {
    fn from(err: bcrypt::BcryptError) -> Self {
       Self::Bcrypt(err.to_string())
    }
 }
 
-impl From<jsonwebtoken::errors::Error> for Error {
+impl From<jsonwebtoken::errors::Error> for AppError {
    fn from(err: jsonwebtoken::errors::Error) -> Self {
       Self::JsonWebToken(err)
    }

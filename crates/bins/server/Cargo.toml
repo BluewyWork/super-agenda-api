@@ -15,5 +15,5 @@ serde_json = "1.0.114"
 strum_macros = "0.26.2"
 tokio = { version = "1.37.0", features = ["full"] }
 
-lib-database = { path = "../../libs/lib-database" }
-lib-utils = { path = "../../libs/lib-utils" }
+database = { path = "../../libs/database" }
+utils = { path = "../../libs/utils" }

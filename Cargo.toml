@@ -1,8 +1,8 @@
 [workspace]
 members = [
-  "crates/bins/server-2",
-  "crates/libs/lib-database",
-  "crates/libs/lib-utils",
+  # "crates/bins/server-2",
+  "crates/libs/database",
+  "crates/libs/utils",
   "crates/bins/server",
   "crates/bins/playground",
 ]

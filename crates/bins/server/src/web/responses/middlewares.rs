@@ -7,10 +7,10 @@ use axum::{
 };
 use serde_json::json;
 
-use crate::web::{error::Error, utils::token::decrypt_token};
+use crate::{error::AppError, web::utils::token::decrypt_token};
 
 pub async fn map_response_from_error(response: Response) -> Response {
-   let service_error = response.extensions().get::<Error>();
+   let service_error = response.extensions().get::<AppError>();
    let client_status_error = service_error.map(|se| se.client_status_and_error());
 
    let error_reponse = client_status_error
@@ -50,10 +50,10 @@ pub async fn authenticate_user_or_admin(mut request: Request, next: Next) -> Res
          },
       },
       Some(Err(_)) => {
-         placeholder.extensions_mut().insert(Error::TokenNotFound);
+         placeholder.extensions_mut().insert(AppError::TokenNotFound);
       },
       None => {
-         placeholder.extensions_mut().insert(Error::TokenNotFound);
+         placeholder.extensions_mut().insert(AppError::TokenNotFound);
       },
    }
 
