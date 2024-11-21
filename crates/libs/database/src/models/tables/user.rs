@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use futures::stream::TryStreamExt;
 use mongodb::{
-   bson::{doc, oid::ObjectId},
+   bson::{doc, oid::ObjectId, to_bson},
    Collection,
 };
 use serde::{Deserialize, Serialize};
@@ -9,6 +11,12 @@ use crate::{
    error::{Error, Result},
    models::database::DatabaseManager,
 };
+
+#[derive(Serialize, Deserialize)]
+pub struct UserForUpdate {
+   #[serde(skip_serializing_if = "Option::is_none")]
+   pub username: Option<String>,
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct User {
@@ -75,15 +83,22 @@ impl UserTable {
 
    // Ideas for implementation:
    // 1. Create custom struct for this operation.
-   pub async fn update_user(&self) -> Result<()> {
-      todo!()
+   pub async fn update_user(&self, id: &str, user_for_update: UserForUpdate) -> Result<()> {
+      let id = ObjectId::from_str(id)?;
+
+      let filter = doc! {"_id": id};
+      let update_query = doc! {"$set": to_bson(&user_for_update)?};
+
+      self
+         .users_collection
+         .update_one(filter, update_query)
+         .await?;
+
+      Ok(())
    }
 
    pub async fn delete_user(&self, _id: ObjectId) -> Result<()> {
-      self
-         .users_collection
-         .delete_one(doc! {"_id": _id})
-         .await?;
+      self.users_collection.delete_one(doc! {"_id": _id}).await?;
 
       Ok(())
    }

@@ -27,6 +27,12 @@ pub struct UserData {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UserDataForUpdate {
+   #[serde(skip_serializing_if = "Option::is_none")]
+   pub membership: Option<Membership>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
    #[serde(rename = "_id")]
    pub id: ObjectId,
@@ -164,5 +170,18 @@ impl UserDataTable {
       let user_data = self.get_user_data(user_id).await?;
 
       Ok(user_data.membership)
+   }
+
+   pub async fn update_user_data(
+      &self,
+      user_id: String,
+      user_data_for_update: UserDataForUpdate,
+   ) -> Result<()> {
+      let filter = doc! {"owner": user_id };
+      let update = doc! {"$set": to_bson(&user_data_for_update)? };
+
+      self.user_data_collection.update_one(filter, update).await?;
+
+      Ok(())
    }
 }
