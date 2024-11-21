@@ -4,7 +4,9 @@ use axum::{
    extract::{Path, State},
    http::StatusCode,
 };
-use database::models::tables::admin::Admin;
+use database::models::tables::admin::{Admin, AdminForUpdate};
+use mongodb::bson::oid::ObjectId;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
@@ -56,18 +58,13 @@ pub async fn show_all(State(app_state): State<Arc<AppState>>) -> AppResult<ApiRe
 
 pub async fn update(
    State(app_state): State<Arc<AppState>>,
-   Json(admin): Json<Admin>,
+   Path(id): Path<String>,
+   Json(admin_for_update): Json<AdminForUpdate>,
 ) -> AppResult<ApiResponse> {
-   if app_state
+   app_state
       .admin_table
-      .find_admin_from_username(&admin.username)
-      .await
-      .is_ok()
-   {
-      return Err(AppError::UsernameIsTaken);
-   }
-
-   app_state.admin_table.update_admin(admin).await?;
+      .update_admin(&id, admin_for_update)
+      .await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::OK,

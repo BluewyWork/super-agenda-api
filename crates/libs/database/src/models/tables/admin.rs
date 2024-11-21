@@ -20,6 +20,12 @@ pub struct Admin {
    pub hashed_password: String,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct AdminForUpdate {
+   #[serde(skip_serializing_if = "Option::is_none")]
+   pub username: Option<String>
+}
+
 #[derive(Clone)]
 pub struct AdminTable {
    admin_collection: Collection<Admin>,
@@ -36,6 +42,19 @@ impl AdminTable {
       let admin = match self
          .admin_collection
          .find_one(doc! {"username": username})
+         .await?
+      {
+         Some(admin) => admin,
+         None => return Err(Error::UnableToFindUser),
+      };
+
+      Ok(admin)
+   }
+
+  pub async fn find_admin_from_id(&self, id: ObjectId) -> Result<Admin> {
+      let admin = match self
+         .admin_collection
+         .find_one(doc! {"_id": id})
          .await?
       {
          Some(admin) => admin,
@@ -63,9 +82,11 @@ impl AdminTable {
       Ok(())
    }
 
-   pub async fn update_admin(&self, admin: Admin) -> Result<()> {
-      let filter = doc! {"_id": admin.id};
-      let update_query = doc! { "$set": to_bson(&admin)?};
+   pub async fn update_admin(&self, id: &str, admin_for_update: AdminForUpdate) -> Result<()> {
+      let id = ObjectId::from_str(id)?;
+
+      let filter = doc! {"_id": id};
+      let update_query = doc! { "$set": to_bson(&admin_for_update)? };
 
       self
          .admin_collection

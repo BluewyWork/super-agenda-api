@@ -34,7 +34,9 @@ use std::sync::Arc;
 use tokio::net::TcpListener;
 use utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use web::responses::{
-   handlers::{admin_admin, admin_user, user_self, user_tasks},
+   handlers::{
+      admin_admin::{self, new}, admin_auth, admin_user, user_auth, user_self, user_tasks
+   },
    middlewares::authenticate_user_or_admin,
 };
 
@@ -56,6 +58,14 @@ async fn main() -> AppResult<()> {
 
    let app = Router::new()
       .nest(
+         "/api", 
+         Router::new()
+         .route("/auth/admin/login", post(admin_auth::login))
+         .route("/auth/user/login", post(user_auth::login))
+         .route("/auth/user/register", post(user_auth::register))
+         .with_state(Arc::clone(&app_state))
+      )
+      .nest(
          "/api",
          Router::new()
             .route("/admins", post(admin_admin::new))
@@ -63,12 +73,12 @@ async fn main() -> AppResult<()> {
             .route("/admins/:id", patch(admin_admin::update))
             .route("/admins/:id", delete(admin_admin::delete))
             .route("/users", get(admin_user::show_user_list))
-            .route("/users/self", patch(user_self::update))
-            .route("/users/self", delete(user_self::nuke))
-            .route("/users/self/tasks", post(user_tasks::create))
-            .route("/users/self/tasks", get(user_tasks::show_list))
-            .route("/users/self/tasks", patch(user_tasks::update))
-            .route("/users/self/tasks", delete(user_tasks::delete))
+            .route("/users/claims/self", patch(user_self::update))
+            .route("/users/claims/self", delete(user_self::nuke))
+            .route("/users/claims/self/tasks", post(user_tasks::create))
+            .route("/users/claims/self/tasks", get(user_tasks::show_list))
+            .route("/users/claims/self/tasks", patch(user_tasks::update))
+            .route("/users/claims/self/tasks", delete(user_tasks::delete))
             .layer(from_fn(authenticate_user_or_admin))
             .with_state(Arc::clone(&app_state)),
       )
