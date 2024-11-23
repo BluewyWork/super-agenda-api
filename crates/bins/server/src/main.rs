@@ -60,9 +60,9 @@ async fn main() -> AppResult<()> {
       .nest(
          "/api", 
          Router::new()
-         .route("/auth/admin/login", post(admin_auth::login))
-         .route("/auth/user/login", post(user_auth::login))
-         .route("/auth/user/register", post(user_auth::register))
+         .route("/auth/login/admin", post(admin_auth::login))
+         .route("/auth/login/user", post(user_auth::login))
+         .route("/auth/register/user", post(user_auth::register))
          .with_state(Arc::clone(&app_state))
       )
       .nest(
@@ -74,12 +74,12 @@ async fn main() -> AppResult<()> {
             .route("/admins/:id", delete(admin_admin::delete))
             .route("/users", get(admin_user::show_user_list))
             .route("/users/:id", patch(admin_user::update_user))
-            .route("/users/claims/self", patch(user_self::update))
-            .route("/users/claims/self", delete(user_self::nuke))
-            .route("/users/claims/tasks", post(user_tasks::create))
-            .route("/users/claims/tasks", get(user_tasks::show_list))
-            .route("/users/claims/tasks", patch(user_tasks::update))
-            .route("/users/claims/tasks", delete(user_tasks::delete))
+            .route("/claims/user", patch(user_self::update))
+            .route("/claims/user", delete(user_self::nuke))
+            .route("/claims/tasks", post(user_tasks::create))
+            .route("/claims/tasks", get(user_tasks::show_list))
+            .route("/claims/tasks", patch(user_tasks::update))
+            .route("/claims/tasks", delete(user_tasks::delete))
             .layer(from_fn(authenticate_user_or_admin))
             .with_state(Arc::clone(&app_state)),
       )
