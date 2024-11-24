@@ -18,8 +18,7 @@ pub async fn map_response_from_error(response: Response) -> Response {
       .map(|(status_code, client_error)| {
          let client_error_body = json!({
             "ok": false,
-            "message": client_error.as_ref(),
-            "data": {}
+            "error": client_error.as_ref(),
          });
 
          (*status_code, Json(client_error_body)).into_response()

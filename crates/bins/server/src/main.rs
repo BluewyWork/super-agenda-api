@@ -35,7 +35,8 @@ use tokio::net::TcpListener;
 use utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use web::responses::{
    handlers::{
-      admin_admin::{self, new}, admin_auth, admin_user, user_auth, user_self, user_tasks
+      admin_admin::{self, new},
+      admin_auth, admin_user, user_auth, user_self, user_tasks,
    },
    middlewares::authenticate_user_or_admin,
 };
@@ -58,12 +59,12 @@ async fn main() -> AppResult<()> {
 
    let app = Router::new()
       .nest(
-         "/api", 
+         "/api",
          Router::new()
-         .route("/auth/login/admin", post(admin_auth::login))
-         .route("/auth/login/user", post(user_auth::login))
-         .route("/auth/register/user", post(user_auth::register))
-         .with_state(Arc::clone(&app_state))
+            .route("/auth/login/admin", post(admin_auth::login))
+            .route("/auth/login/user", post(user_auth::login))
+            .route("/auth/register/user", post(user_auth::register))
+            .with_state(Arc::clone(&app_state)),
       )
       .nest(
          "/api",
@@ -74,6 +75,7 @@ async fn main() -> AppResult<()> {
             .route("/admins/:id", delete(admin_admin::delete))
             .route("/users", get(admin_user::show_user_list))
             .route("/users/:id", patch(admin_user::update_user))
+            .route("/claims/user", get(user_self::show))
             .route("/claims/user", patch(user_self::update))
             .route("/claims/user", delete(user_self::nuke))
             .route("/claims/tasks", post(user_tasks::create))
