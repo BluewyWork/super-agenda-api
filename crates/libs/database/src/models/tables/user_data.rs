@@ -41,6 +41,7 @@ pub struct Task {
    pub status: TaskStatus,
    pub start_date_time: Option<DateTime>,
    pub end_date_time: Option<DateTime>,
+   pub image: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
