@@ -24,12 +24,15 @@ pub struct UserData {
    owner: ObjectId,
    task_list: Vec<Task>,
    membership: Membership,
+   last_modified: Option<DateTime>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserDataForUpdate {
    #[serde(skip_serializing_if = "Option::is_none")]
    pub membership: Option<Membership>,
+   #[serde(skip_serializing_if = "Option::is_none")]
+   pub last_modified: Option<DateTime>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -156,6 +159,7 @@ impl UserDataTable {
             owner: user_id,
             task_list: Vec::new(),
             membership: Membership::FREE,
+            last_modified: None,
          };
 
          self
@@ -166,6 +170,8 @@ impl UserDataTable {
 
       Ok(())
    }
+
+   // other
 
    pub async fn get_membership(&self, user_id: ObjectId) -> Result<Membership> {
       let user_data = self.get_user_data(user_id).await?;
@@ -184,5 +190,11 @@ impl UserDataTable {
       self.user_data_collection.update_one(filter, update).await?;
 
       Ok(())
+   }
+
+   pub async fn get_last_modified(&self, user_id: ObjectId) -> Result<Option<DateTime>> {
+      let user_data = self.get_user_data(user_id).await?;
+
+      Ok(user_data.last_modified)
    }
 }

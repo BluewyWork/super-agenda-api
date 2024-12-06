@@ -23,7 +23,7 @@ impl IntoResponse for ApiResponse {
       }
 
       if let Some(data) = self.data {
-         body.insert("success".to_string(), json!(data));
+         body.insert("result".to_string(), json!(data));
       }
 
       let body = Json(Value::Object(body));

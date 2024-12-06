@@ -17,6 +17,7 @@ pub enum AppError {
    TokenDaysOverflow,
    TokenNotFound,
    ClaimsNotFound,
+   QueryNotValid,
 
    LibDatabase(database::error::Error),
    Bcrypt(String),
@@ -38,6 +39,7 @@ impl AppError {
          Self::JsonExtraction => (StatusCode::BAD_REQUEST, ClientError::UNEXPECTED_BODY),
          Self::PasswordDoesNotMatch => (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS),
          Self::UsernameIsTaken => (StatusCode::CONFLICT, ClientError::USERNAME_IS_TAKEN),
+         Self::QueryNotValid => (StatusCode::BAD_REQUEST, ClientError::UNEXPECTED_BODY),
 
          Self::ClaimsNotFound | Self::TokenNotFound => {
             (StatusCode::BAD_REQUEST, ClientError::INVALID_CREDENTIALS)
@@ -85,6 +87,7 @@ impl Display for AppError {
          Self::TokenNotFound => String::from("no token found"),
          Self::ClaimsNotFound => String::from("claims not found"),
          Self::UsernameIsTaken => String::from("username is taken"),
+         Self::QueryNotValid => String::from("invalid query"),
 
          Self::Bcrypt(string) => string.to_string(),
          Self::LibDatabase(err) => err.to_string(),

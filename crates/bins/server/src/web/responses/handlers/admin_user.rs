@@ -63,19 +63,24 @@ pub async fn update_user(
 ) -> AppResult<ApiResponse> {
    let user_data_for_update = UserDataForUpdate {
       membership: user_stuff_for_update.membership,
+      last_modified: None,
    };
 
    let user_for_update = UserForUpdate {
       username: user_stuff_for_update.username,
    };
 
-   app_state.user_table.update_user(&id, user_for_update).await?;
+   app_state
+      .user_table
+      .update_user(&id, user_for_update)
+      .await?;
 
    app_state
       .user_data_table
-      .update_user_data(id, user_data_for_update).await?;
+      .update_user_data(id, user_data_for_update)
+      .await?;
 
- Ok(ApiResponse {
+   Ok(ApiResponse {
       message: None,
       status_code: StatusCode::OK,
       data: None,

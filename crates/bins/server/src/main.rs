@@ -9,6 +9,7 @@ pub mod web {
          pub mod admin_auth;
          pub mod admin_user;
          pub mod user_auth;
+         pub mod user_data;
          pub mod user_self;
          pub mod user_tasks;
       }
@@ -36,7 +37,7 @@ use utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use web::responses::{
    handlers::{
       admin_admin::{self, new},
-      admin_auth, admin_user, user_auth, user_self, user_tasks,
+      admin_auth, admin_user, user_auth, user_data, user_self, user_tasks,
    },
    middlewares::authenticate_user_or_admin,
 };
@@ -73,11 +74,17 @@ async fn main() -> AppResult<()> {
             .route("/admins", get(admin_admin::show_all))
             .route("/admins/:id", patch(admin_admin::update))
             .route("/admins/:id", delete(admin_admin::delete))
+            //
             .route("/users", get(admin_user::show_user_list))
             .route("/users/:id", patch(admin_user::update_user))
+            //
+            .route("/claims/user_data", patch(user_data::update))
+            .route("/claims/user_data", get(user_data::get))
+            //
             .route("/claims/user", get(user_self::show))
             .route("/claims/user", patch(user_self::update))
             .route("/claims/user", delete(user_self::nuke))
+            //
             .route("/claims/tasks", post(user_tasks::create))
             .route("/claims/tasks", get(user_tasks::show_list))
             .route("/claims/tasks", patch(user_tasks::update))
