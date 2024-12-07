@@ -33,12 +33,11 @@ use database::models::{
    database::DatabaseManager,
    tables::{admin::AdminTable, user::UserTable, user_data::UserDataTable},
 };
-use mongodb::bson::DateTime;
 use tokio::net::TcpListener;
 use utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use web::responses::{
    handlers::{
-      admin_admin::{self, new},
+      admin_admin::{self},
       admin_auth, admin_user, user_auth, user_data, user_self, user_tasks,
    },
    middlewares::authenticate_user_or_admin,

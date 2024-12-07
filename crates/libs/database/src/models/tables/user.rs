@@ -1,4 +1,3 @@
-use std::str::FromStr;
 
 use futures::stream::TryStreamExt;
 use mongodb::{
