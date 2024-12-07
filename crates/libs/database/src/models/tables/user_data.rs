@@ -181,16 +181,30 @@ impl UserDataTable {
 
    pub async fn update_user_data(
       &self,
-      user_id: String,
+      user_id: ObjectId,
       user_data_for_update: UserDataForUpdate,
    ) -> Result<()> {
-      let filter = doc! {"owner": user_id };
-      let update = doc! {"$set": to_bson(&user_data_for_update)? };
+      let filter = doc! {"owner": &user_id };
+      let mut update = doc! {};
+
+      if let Some(membership) = user_data_for_update.membership {
+         update.insert("membership", to_bson(&membership)?);
+      }
+
+      if let Some(last_modified) = user_data_for_update.last_modified {
+         update.insert("last_modified", to_bson(&last_modified)?);
+      }
+
+      let update = doc! { "$set": update};
 
       self.user_data_collection.update_one(filter, update).await?;
 
       Ok(())
    }
+
+   // pub async fn update_last_modified(&self, user_id: ObjectId) {
+   //
+   //}
 
    pub async fn get_last_modified(&self, user_id: ObjectId) -> Result<Option<DateTime>> {
       let user_data = self.get_user_data(user_id).await?;

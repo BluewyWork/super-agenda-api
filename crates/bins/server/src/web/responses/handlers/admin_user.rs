@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 use axum::{
    extract::{Path, State},
@@ -61,6 +61,8 @@ pub async fn update_user(
    Path(id): Path<String>,
    Json(user_stuff_for_update): Json<UserStuffForUpdate>,
 ) -> AppResult<ApiResponse> {
+   let id = ObjectId::from_str(&id)?;
+
    let user_data_for_update = UserDataForUpdate {
       membership: user_stuff_for_update.membership,
       last_modified: None,
@@ -72,7 +74,7 @@ pub async fn update_user(
 
    app_state
       .user_table
-      .update_user(&id, user_for_update)
+      .update_user(id, user_for_update)
       .await?;
 
    app_state

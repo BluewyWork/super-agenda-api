@@ -23,7 +23,7 @@ pub struct Admin {
 #[derive(Serialize, Deserialize)]
 pub struct AdminForUpdate {
    #[serde(skip_serializing_if = "Option::is_none")]
-   pub username: Option<String>
+   pub username: Option<String>,
 }
 
 #[derive(Clone)]
@@ -51,12 +51,8 @@ impl AdminTable {
       Ok(admin)
    }
 
-  pub async fn find_admin_from_id(&self, id: ObjectId) -> Result<Admin> {
-      let admin = match self
-         .admin_collection
-         .find_one(doc! {"_id": id})
-         .await?
-      {
+   pub async fn find_admin_from_id(&self, id: ObjectId) -> Result<Admin> {
+      let admin = match self.admin_collection.find_one(doc! {"_id": id}).await? {
          Some(admin) => admin,
          None => return Err(Error::UnableToFindUser),
       };

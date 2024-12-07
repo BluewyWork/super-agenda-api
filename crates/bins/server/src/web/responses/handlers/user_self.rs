@@ -6,9 +6,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
+   error::AppResult,
    web::{custom::response::ApiResponse, utils::token::Claims},
    AppState,
-error::AppResult
 };
 
 #[derive(Serialize, Deserialize)]
@@ -17,7 +17,10 @@ pub struct UserShowPayload {
    membership: Membership,
 }
 
-pub async fn show(State(app_state): State<Arc<AppState>>, claims: Claims) -> AppResult<ApiResponse> {
+pub async fn show(
+   State(app_state): State<Arc<AppState>>,
+   claims: Claims,
+) -> AppResult<ApiResponse> {
    let user = app_state
       .user_table
       .find_user_from_object_id(claims.user_id)
@@ -44,7 +47,10 @@ pub async fn update() -> AppResult<ApiResponse> {
    todo!()
 }
 
-pub async fn nuke(State(app_state): State<Arc<AppState>>, claims: Claims) -> AppResult<ApiResponse> {
+pub async fn nuke(
+   State(app_state): State<Arc<AppState>>,
+   claims: Claims,
+) -> AppResult<ApiResponse> {
    app_state.user_table.delete_user(claims.user_id).await?;
    app_state.user_data_table.delete(claims.user_id).await?;
 

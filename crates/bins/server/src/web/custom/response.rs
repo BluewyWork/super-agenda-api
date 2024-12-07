@@ -14,7 +14,6 @@ pub struct ApiResponse {
 impl IntoResponse for ApiResponse {
    fn into_response(self) -> Response {
       let ok = self.status_code < StatusCode::from_u16(400).unwrap();
-
       let mut body = Map::new();
       body.insert("ok".to_string(), json!(ok));
 
@@ -27,9 +26,6 @@ impl IntoResponse for ApiResponse {
       }
 
       let body = Json(Value::Object(body));
-
-      println!("here");
-
       (self.status_code, body).into_response()
    }
 }

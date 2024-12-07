@@ -83,9 +83,7 @@ impl UserTable {
 
    // Ideas for implementation:
    // 1. Create custom struct for this operation.
-   pub async fn update_user(&self, id: &str, user_for_update: UserForUpdate) -> Result<()> {
-      let id = ObjectId::from_str(id)?;
-
+   pub async fn update_user(&self, id: ObjectId, user_for_update: UserForUpdate) -> Result<()> {
       let filter = doc! {"_id": id};
       let update_query = doc! {"$set": to_bson(&user_for_update)?};
 

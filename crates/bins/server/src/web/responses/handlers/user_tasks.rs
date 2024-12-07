@@ -8,12 +8,12 @@ use database::models::tables::user_data::Task;
 use serde_json::json;
 
 use crate::{
+   error::AppResult,
    web::{
       custom::{extractors::Json, response::ApiResponse},
       utils::token::Claims,
    },
    AppState,
-      error::AppResult,
 };
 
 pub async fn create(

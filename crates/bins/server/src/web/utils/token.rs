@@ -1,8 +1,8 @@
 use chrono::{TimeDelta, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use utils::constants::JWT_SECRET;
 use mongodb::bson::oid::ObjectId;
 use serde::{Deserialize, Serialize};
+use utils::constants::JWT_SECRET;
 
 use crate::error::{AppError, AppResult};
 

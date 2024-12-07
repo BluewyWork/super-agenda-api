@@ -22,6 +22,8 @@ pub mod web {
 }
 pub mod error;
 
+use std::sync::Arc;
+
 use axum::{
    middleware::{from_fn, map_response},
    routing::{delete, get, patch, post},
@@ -31,7 +33,7 @@ use database::models::{
    database::DatabaseManager,
    tables::{admin::AdminTable, user::UserTable, user_data::UserDataTable},
 };
-use std::sync::Arc;
+use mongodb::bson::DateTime;
 use tokio::net::TcpListener;
 use utils::constants::{MONGO_DB, MONGO_URI, SERVER_ADDRESS};
 use web::responses::{
@@ -42,8 +44,7 @@ use web::responses::{
    middlewares::authenticate_user_or_admin,
 };
 
-use crate::error::AppResult;
-use crate::web::responses::middlewares::map_response_from_error;
+use crate::{error::AppResult, web::responses::middlewares::map_response_from_error};
 
 #[tokio::main]
 async fn main() -> AppResult<()> {

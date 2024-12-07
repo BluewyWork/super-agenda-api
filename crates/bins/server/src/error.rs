@@ -19,6 +19,8 @@ pub enum AppError {
    ClaimsNotFound,
    QueryNotValid,
 
+   MongoDB(mongodb::error::Error),
+   MongoDBOID(mongodb::bson::oid::Error),
    LibDatabase(database::error::Error),
    Bcrypt(String),
    JsonWebToken(jsonwebtoken::errors::Error),
@@ -55,6 +57,8 @@ impl AppError {
          ),
 
          Self::TokenDaysOverflow
+         | Self::MongoDB(_)
+         | Self::MongoDBOID(_)
          | Self::Bcrypt(_)
          | Self::LibDatabase(_)
          | Self::JsonWebToken(_) => (
@@ -89,6 +93,8 @@ impl Display for AppError {
          Self::UsernameIsTaken => String::from("username is taken"),
          Self::QueryNotValid => String::from("invalid query"),
 
+         Self::MongoDB(err) => err.to_string(),
+         Self::MongoDBOID(err) => err.to_string(),
          Self::Bcrypt(string) => string.to_string(),
          Self::LibDatabase(err) => err.to_string(),
          Self::JsonWebToken(err) => err.to_string(),
@@ -113,5 +119,17 @@ impl From<bcrypt::BcryptError> for AppError {
 impl From<jsonwebtoken::errors::Error> for AppError {
    fn from(err: jsonwebtoken::errors::Error) -> Self {
       Self::JsonWebToken(err)
+   }
+}
+
+impl From<mongodb::error::Error> for AppError {
+   fn from(err: mongodb::error::Error) -> Self {
+      Self::MongoDB(err)
+   }
+}
+
+impl From<mongodb::bson::oid::Error> for AppError {
+   fn from(err: mongodb::bson::oid::Error) -> Self {
+      Self::MongoDBOID(err)
    }
 }

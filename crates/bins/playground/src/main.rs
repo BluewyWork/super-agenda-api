@@ -1,11 +1,9 @@
 use database::models::{
    database::DatabaseManager,
-   tables::
-      admin::{Admin, AdminTable}
-   ,
+   tables::admin::{Admin, AdminTable},
 };
-use utils::constants::{MONGO_DB, MONGO_URI};
 use mongodb::bson::oid::ObjectId;
+use utils::constants::{MONGO_DB, MONGO_URI};
 
 #[tokio::main]
 async fn main() {
@@ -30,7 +28,10 @@ pub async fn create_admin_example() {
       .await
       .unwrap();
 
-   let admin = admin_table.find_admin_from_username("tarriiik").await.unwrap();
+   let admin = admin_table
+      .find_admin_from_username("tarriiik")
+      .await
+      .unwrap();
 
    println!("{}, {}", admin.username, admin.hashed_password);
 }

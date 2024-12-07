@@ -22,7 +22,7 @@ pub async fn update(
 ) -> AppResult<ApiResponse> {
    app_state
       .user_data_table
-      .update_user_data(claims.user_id.to_string(), payload)
+      .update_user_data(claims.user_id, payload)
       .await?;
 
    Ok(ApiResponse {
