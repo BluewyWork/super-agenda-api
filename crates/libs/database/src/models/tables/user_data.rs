@@ -44,7 +44,8 @@ pub struct Task {
    pub status: TaskStatus,
    pub start_date_time: Option<DateTime>,
    pub end_date_time: Option<DateTime>,
-   pub image: Option<String>,
+   pub end_estimated_date_time: Option<DateTime>,
+   pub images: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
