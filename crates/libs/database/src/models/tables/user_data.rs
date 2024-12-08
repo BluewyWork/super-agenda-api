@@ -48,7 +48,7 @@ pub struct Task {
    pub images: Vec<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum TaskStatus {
    NotStarted,
    Ongoing,

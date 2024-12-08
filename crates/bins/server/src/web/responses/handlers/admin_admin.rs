@@ -18,24 +18,33 @@ use crate::{
 
 pub async fn new(
    State(app_state): State<Arc<AppState>>,
-   Json(admin_payload): Json<Admin>,
+   Json(admin_for_create): Json<Admin>,
 ) -> AppResult<ApiResponse> {
-   let admin = Admin {
-      id: admin_payload.id,
-      username: admin_payload.username,
-      hashed_password: hash_password(&admin_payload.hashed_password)?,
-   };
+   if admin_for_create.username.len() < 5 {
+      return Err(AppError::UsernameTooShort);
+   }
 
    if app_state
       .admin_table
-      .find_admin_from_username(&admin.username)
+      .find_admin_from_username(&admin_for_create.username)
       .await
       .is_ok()
    {
       return Err(AppError::UsernameIsTaken);
    }
 
-   app_state.admin_table.create_admin(admin).await?;
+   if admin_for_create.hashed_password.len() < 5 {
+      return Err(AppError::PasswordTooShort);
+   }
+
+   app_state
+      .admin_table
+      .create_admin(Admin {
+         id: admin_for_create.id,
+         username: admin_for_create.username,
+         hashed_password: hash_password(&admin_for_create.hashed_password)?,
+      })
+      .await?;
 
    Ok(ApiResponse {
       status_code: StatusCode::CREATED,

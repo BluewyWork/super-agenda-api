@@ -77,6 +77,8 @@ async fn main() -> AppResult<()> {
             //
             .route("/users", get(admin_user::show_user_list))
             .route("/users/:id", patch(admin_user::update_user))
+            .route("/users", post(admin_user::create_user))
+            .route("/users/:id", delete(admin_user::delete_user))
             //
             .route("/claims/user_data", patch(user_data::update))
             .route("/claims/user_data", get(user_data::get))
