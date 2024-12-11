@@ -86,11 +86,11 @@ pub async fn update_list(
 pub async fn delete(
    State(app_state): State<Arc<AppState>>,
    claims: Claims,
-   Path(task_id): Path<String>,
+   Path(id): Path<String>,
 ) -> AppResult<ApiResponse> {
    app_state
       .user_data_table
-      .delete_task(claims.user_id, task_id)
+      .delete_task(claims.user_id, id)
       .await?;
 
    Ok(ApiResponse {

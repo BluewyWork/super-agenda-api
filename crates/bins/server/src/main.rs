@@ -90,7 +90,7 @@ async fn main() -> AppResult<()> {
             .route("/claims/tasks", post(user_tasks::create))
             .route("/claims/tasks", get(user_tasks::show_list))
             .route("/claims/tasks", patch(user_tasks::update))
-            .route("/claims/tasks", delete(user_tasks::delete))
+            .route("/claims/tasks/:id", delete(user_tasks::delete))
             .layer(from_fn(authenticate_user_or_admin))
             .with_state(Arc::clone(&app_state)),
       )
