@@ -18,6 +18,7 @@ pub enum AppError {
    TokenNotFound,
    ClaimsNotFound,
    QueryNotValid,
+   NotPremium,
 
    MongoDB(mongodb::error::Error),
    MongoDBOID(mongodb::bson::oid::Error),
@@ -42,6 +43,7 @@ impl AppError {
          Self::PasswordDoesNotMatch => (StatusCode::FORBIDDEN, ClientError::INVALID_CREDENTIALS),
          Self::UsernameIsTaken => (StatusCode::CONFLICT, ClientError::USERNAME_IS_TAKEN),
          Self::QueryNotValid => (StatusCode::BAD_REQUEST, ClientError::UNEXPECTED_BODY),
+         Self::NotPremium => (StatusCode::UPGRADE_REQUIRED, ClientError::NOT_PREMIUM),
 
          Self::ClaimsNotFound | Self::TokenNotFound => {
             (StatusCode::BAD_REQUEST, ClientError::INVALID_CREDENTIALS)
@@ -78,6 +80,7 @@ pub enum ClientError {
    UNEXPECTED_BODY,
    SERVICE_ERROR,
    USERNAME_IS_TAKEN,
+   NOT_PREMIUM
 }
 
 impl Display for AppError {
@@ -92,6 +95,7 @@ impl Display for AppError {
          Self::ClaimsNotFound => String::from("claims not found"),
          Self::UsernameIsTaken => String::from("username is taken"),
          Self::QueryNotValid => String::from("invalid query"),
+         Self::NotPremium => String::from("need upgrade to premium"),
 
          Self::MongoDB(err) => err.to_string(),
          Self::MongoDBOID(err) => err.to_string(),

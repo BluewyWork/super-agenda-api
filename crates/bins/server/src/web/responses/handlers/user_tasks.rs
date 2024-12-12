@@ -8,7 +8,7 @@ use database::models::tables::user_data::Task;
 use serde_json::json;
 
 use crate::{
-   error::AppResult,
+   error::{AppError, AppResult},
    web::{
       custom::{extractors::Json, response::ApiResponse},
       utils::token::Claims,
@@ -21,6 +21,15 @@ pub async fn create(
    claims: Claims,
    Json(task): Json<Task>,
 ) -> AppResult<ApiResponse> {
+   let tasks = app_state
+      .user_data_table
+      .get_task_list(claims.user_id)
+      .await?;
+
+   if tasks.len() > 4 {
+      return Err(AppError::NotPremium);
+   }
+
    app_state
       .user_data_table
       .create_task(claims.user_id, task)
