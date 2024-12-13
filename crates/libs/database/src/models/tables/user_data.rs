@@ -115,7 +115,10 @@ impl UserDataTable {
       let result = self.user_data_collection.find_one(filter.clone()).await;
 
       match result {
-         Ok(_) => {},
+         Ok(ok) => match ok {
+            Some(_) => {},
+            None => self.create_task(user_id, task).await?,
+         },
          Err(_) => {
             // Quick fix for importing tasks (on the android side) that might need to be created
             // because this is the first solution I thought of.
