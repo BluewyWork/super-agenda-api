@@ -22,14 +22,14 @@ pub async fn create_admin_example() {
    admin_table
       .create_admin(Admin {
          id: ObjectId::new(),
-         username: String::from("tarriiik"),
-         hashed_password: hash_password("tarriiik"),
+         username: String::from("admin"),
+         hashed_password: hash_password("admin"),
       })
       .await
       .unwrap();
 
    let admin = admin_table
-      .find_admin_from_username("tarriiik")
+      .find_admin_from_username("admin")
       .await
       .unwrap();
 
