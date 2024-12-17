@@ -173,6 +173,11 @@ pub async fn delete_user(
       .delete_user(ObjectId::from_str(&id)?)
       .await?;
 
+   app_state
+      .user_data_table
+      .delete(ObjectId::from_str(&id)?)
+      .await?;
+
    Ok(ApiResponse {
       message: None,
       status_code: StatusCode::OK,
