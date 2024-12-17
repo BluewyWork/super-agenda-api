@@ -4,7 +4,10 @@ use axum::{
    extract::{Path, State},
    http::StatusCode,
 };
-use database::models::tables::user_data::Task;
+use database::models::{
+   self,
+   tables::user_data::{Membership, Task},
+};
 use serde_json::json;
 
 use crate::{
@@ -26,8 +29,15 @@ pub async fn create(
       .get_task_list(claims.user_id)
       .await?;
 
-   if tasks.len() > 4 {
-      return Err(AppError::NotPremium);
+   let membership = app_state
+      .user_data_table
+      .get_membership(claims.user_id)
+      .await?;
+
+   if let Membership::FREE = membership {
+      if tasks.len() > 4 {
+         return Err(AppError::NotPremium);
+      }
    }
 
    app_state
